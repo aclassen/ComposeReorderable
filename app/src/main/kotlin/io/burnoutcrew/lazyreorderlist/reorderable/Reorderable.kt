@@ -44,13 +44,7 @@ fun <T> Modifier.reorderable(
     autoScrollAnimationSpec: AnimationSpec<Float> = tween(1000, easing = LinearEasing),
 ): Modifier = reorderable(
     state,
-    { draggedItem, near ->
-        when {
-            near == null -> null
-            draggedItem == null -> near
-            else -> near.also { items.move(draggedItem, it) }
-        }
-    },
+    { fromPos, toPos -> items.move(fromPos, toPos) },
     orientation,
     autoScrollAnimationSpec
 )
@@ -58,7 +52,7 @@ fun <T> Modifier.reorderable(
 @SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.reorderable(
     state: ReorderableState,
-    onNearestChanged: (Int?, Int?) -> (Int?),
+    onMove: (Int, Int) -> (Unit),
     orientation: Orientation = Orientation.Vertical,
     autoScrollAnimationSpec: AnimationSpec<Float> = tween(1000, easing = LinearEasing),
 ): Modifier = composed {
@@ -66,23 +60,29 @@ fun Modifier.reorderable(
     val scope = rememberCoroutineScope()
     LaunchedEffect(state) {
         snapshotFlow { state.listState.layoutInfo }
-            .combine(snapshotFlow { state.position }.distinctUntilChanged()) { state, pos ->
+            .combine(snapshotFlow { state.position }.distinctUntilChanged()) { layoutInfo, pos ->
                 pos?.let { draggedCenter ->
-                    state.visibleItemsInfo
+                    layoutInfo.visibleItemsInfo
                         .minByOrNull { (draggedCenter - (it.offset + it.size / 2f)).absoluteValue }
                 }?.index
             }
             .distinctUntilChanged()
-            .collect {
-                state.index = onNearestChanged(state.index, it)
+            .collect { nearest ->
+                state.index = state.index.let { index ->
+                    when {
+                        nearest == null -> null
+                        index == null -> nearest
+                        else -> nearest.also { onMove(index, it) }
+                    }
+                }
             }
     }
     Modifier.pointerInput(Unit) {
         detectDragGesturesAfterLongPress(
             onDragStart = { offset ->
-                val off = (if (orientation == Orientation.Vertical) offset.y else offset.x).toInt()
+                val startOffset = (if (orientation == Orientation.Vertical) offset.y else offset.x).toInt()
                 state.listState.layoutInfo.visibleItemsInfo
-                    .firstOrNull { off in it.offset..it.offset + it.size }
+                    .firstOrNull { startOffset in it.offset..it.offset + it.size }
                     ?.also {
                         autoScrollViewportOffset = it.size / 2
                         state.position = it.offset + it.size / 2f
