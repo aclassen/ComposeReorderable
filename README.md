@@ -20,7 +20,7 @@ Apply the offset to your item layout :
 ```
 itemsIndexed(items) { idx, item ->
     Column(
-        modifier = Modifier.draggedItem(if (state.index == idx) state.offset else null)
+        modifier = Modifier.draggedItem(state.offset.takeIf { state.index == idx })
     ) {
         ...
     }
