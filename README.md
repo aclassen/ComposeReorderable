@@ -1,9 +1,10 @@
 # Lazy reorder list
 ![Sample](readme/sample.gif)
 
-A sample reorderable list built with Jetpack Compose.
+A reorderable list built with Jetpack Compose.
 
-
+## How to use
+------------
 Create your LazyColumn or LazyRow:
 
 ```
@@ -30,17 +31,17 @@ itemsIndexed(items) { idx, item ->
 }
 ```
 Use `draggedItem` for a default dragged effect or create your own.
+## Notes
+------------
+**Don`t use keyed items cause in this case the LazyList will [keep the scroll position based on the key](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/package-summary#(androidx.compose.foundation.lazy.LazyListScope).items(kotlin.collections.List,kotlin.Function1,kotlin.Function2))**
 
-Unfortunately this solution has some known limitations.
+When dragging, the existing item will be modified.
+Because if this reason it`s important that the item must be part of the LazyList visible items all the time.
 
-* You can`t use keyed items cause in this case the LazyList will [keep the scroll position based on the key](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/package-summary#(androidx.compose.foundation.lazy.LazyListScope).items(kotlin.collections.List,kotlin.Function1,kotlin.Function2))
-* Every item must be a drag target
-* Equal item size in drag direction
-
-
-
+This can be problematic when moving items close to LazyList bounds or there are no drop targets between them.
 
 ## License
+------------
 ```
 Copyright 2021 André Claßen
 

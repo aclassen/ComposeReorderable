@@ -15,23 +15,160 @@
  */
 package io.burnoutcrew.lazyreorderlist.reorderable
 
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.lazy.LazyListItemInfo
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import kotlin.math.absoluteValue
+import kotlin.math.min
+import kotlin.math.sign
 
 @Composable
-fun rememberReorderState(listState: LazyListState): ReorderableState =
+fun rememberReorderState(
+    listState: LazyListState = rememberLazyListState(),
+    canDragOver: (Int) -> Boolean = { true },
+    isDragEnabled: (Int) -> Boolean = { true },
+    onMove: (Int, Int) -> (Unit),
+): ReorderableState =
     remember {
-        ReorderableState(listState)
+        ReorderableState(listState, canDragOver, isDragEnabled, onMove)
     }
 
-class ReorderableState(val listState: LazyListState) {
-    var position by mutableStateOf<Float?>(null)
-        internal set
+class ReorderableState(
+    val listState: LazyListState,
+    private val canDragOver: (Int) -> Boolean = { true },
+    private val isDragEnabled: (Int) -> Boolean = { true },
+    private val onMove: (Int, Int) -> (Unit),
+) {
+    private fun LazyListItemInfo.offsetEnd() =
+        offset + size
+
+    private fun LazyListLayoutInfo.itemInfoByIndex(index: Int) =
+        visibleItemsInfo.getOrNull(index - visibleItemsInfo.first().index)
+
+    private var selected by mutableStateOf<LazyListItemInfo?>(null)
+    private var movedDist by mutableStateOf(0f)
+    private val draggedItem get() = index?.let { listState.layoutInfo.itemInfoByIndex(it) }
+    private val viewportStartOffset get() = listState.layoutInfo.viewportStartOffset.toFloat()
+    private val viewportEndOffset get() = listState.layoutInfo.viewportEndOffset.toFloat()
+
     var index by mutableStateOf<Int?>(null)
         internal set
-    val indexWithOffset by derivedStateOf {
+
+    val offset by derivedStateOf {
         index
-            ?.let { listState.layoutInfo.visibleItemsInfo.getOrNull(it - listState.firstVisibleItemIndex) }
-            ?.let { Pair(it.index, (position ?: 0f) - it.offset - it.size / 2f) }
+            ?.let { listState.layoutInfo.itemInfoByIndex(it) }
+            ?.let { (selected?.offset?.toFloat() ?: 0f) + movedDist - it.offset }
+    }
+
+    fun startDrag(offset: Int) =
+        listState.layoutInfo.visibleItemsInfo
+            .firstOrNull { offset in it.offset..it.offsetEnd() }
+            ?.takeIf { isDragEnabled(it.index) }
+            ?.also { info ->
+                selected = info
+                index = info.index
+            }
+
+    fun dragBy(amount: Float): Boolean {
+        if (index != null) {
+            movedDist += amount
+            checkIfMoved()
+            return true
+        }
+        return false
+    }
+
+    fun cancelDrag() {
+        index = null
+        selected = null
+        movedDist = 0f
+    }
+
+    suspend fun scrollBy(value: Float) =
+        listState.scrollBy(value)
+            .also {
+                if (it != 0f) checkIfMoved()
+            }
+
+    fun calcAutoScrollOffset(time: Long, maxScroll: Float): Float =
+        selected?.let { selected ->
+            val start = (movedDist + selected.offset)
+            when {
+                movedDist < 0 -> (start - viewportStartOffset).takeIf { it < 0 }
+                movedDist > 0 -> (start + selected.size - viewportEndOffset).takeIf { it > 0 }
+                else -> null
+            }
+                ?.takeIf { it != 0f }
+                ?.let { interpolateOutOfBoundsScroll(selected.size, it, time, maxScroll) }
+        } ?: 0f
+
+    private fun checkIfMoved() {
+        selected?.also { selected ->
+            val start = (movedDist + selected.offset)
+                .coerceIn(viewportStartOffset - selected.size, viewportEndOffset)
+            val end = (start + selected.size)
+                .coerceIn(viewportStartOffset, viewportEndOffset + selected.size)
+            draggedItem?.also { draggedItem ->
+                chooseDropIndex(
+                    listState.layoutInfo.visibleItemsInfo
+                        .filterNot { it.offsetEnd() < start || it.offset > end || it.index == draggedItem.index }
+                        .filter { canDragOver(it.index) }, start, end
+                )?.also { targetIdx ->
+                    onMove(draggedItem.index, targetIdx)
+                    index = targetIdx
+                }
+            }
+        }
+    }
+
+    private fun chooseDropIndex(items: List<LazyListItemInfo>, curStart: Float, curEnd: Float): Int? =
+        draggedItem?.let { draggedItem ->
+            var targetIndex: Int? = null
+            val distance = curStart - draggedItem.offset
+            if (distance != 0f) {
+                var targetDiff = -1f
+                items.forEach { item ->
+                    (when {
+                        distance > 0 -> (item.offsetEnd() - curEnd)
+                            .takeIf { diff -> diff < 0 && item.offsetEnd() > draggedItem.offsetEnd() }
+                        else -> (item.offset - curStart)
+                            .takeIf { diff -> diff > 0 && item.offset < draggedItem.offset }
+                    })
+                        ?.absoluteValue
+                        ?.takeIf { it > targetDiff }
+                        ?.also {
+                            targetDiff = it
+                            targetIndex = item.index
+                        }
+                }
+            }
+            targetIndex
+        }
+
+    companion object {
+        private const val ACCELERATION_LIMIT_TIME_MS: Long = 1500
+        private val EaseOutQuadInterpolator: (Float) -> (Float) = {
+            val t = 1 - it
+            1 - t * t * t * t
+        }
+        private val EaseInQuintInterpolator: (Float) -> (Float) = {
+            it * it * it * it * it
+        }
+
+        fun interpolateOutOfBoundsScroll(viewSize: Int, viewSizeOutOfBounds: Float, time: Long, maxScroll: Float): Float {
+            val outOfBoundsRatio = min(1f, 1f * viewSizeOutOfBounds.absoluteValue / viewSize)
+            val cappedScroll = sign(viewSizeOutOfBounds) * maxScroll * EaseOutQuadInterpolator(outOfBoundsRatio)
+            val timeRatio = if (time > ACCELERATION_LIMIT_TIME_MS) 1f else time.toFloat() / ACCELERATION_LIMIT_TIME_MS
+            return (cappedScroll * EaseInQuintInterpolator(timeRatio)).let {
+                if (it == 0f) {
+                    if (viewSizeOutOfBounds > 0) 1f else -1f
+                } else {
+                    it
+                }
+            }
+        }
     }
 }

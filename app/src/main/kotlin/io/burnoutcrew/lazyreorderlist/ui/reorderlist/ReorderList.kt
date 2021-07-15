@@ -15,22 +15,27 @@
  */
 package io.burnoutcrew.lazyreorderlist.ui.reorderlist
 
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.burnoutcrew.lazyreorderlist.reorderable.ReorderableState
@@ -43,9 +48,15 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     Column {
         HorizontalReorderList(
             items = vm.cats,
+            state = rememberReorderState { from, to -> vm.moveCat(from, to) },
             modifier = Modifier.padding(vertical = 16.dp)
         )
-        VerticalReorderList(items = vm.dogs)
+        VerticalReorderList(
+            items = vm.dogs,
+            state = rememberReorderState(
+                canDragOver = { vm.isDogDragEnabled(it) },
+                isDragEnabled = { vm.isDogDragEnabled(it) },
+                onMove = { from, to -> vm.moveDog(from, to) }))
     }
 }
 
@@ -53,25 +64,22 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
 fun HorizontalReorderList(
     modifier: Modifier = Modifier,
     items: SnapshotStateList<ItemData>,
-    listState: LazyListState = rememberLazyListState()
+    state: ReorderableState,
 ) {
-    val state = rememberReorderState(listState)
     LazyRow(
-        state = listState,
+        state = state.listState,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .reorderable(state, items, Orientation.Horizontal)
+            .reorderable(state, Orientation.Horizontal)
             .then(modifier),
     ) {
         itemsIndexed(items) { idx, item ->
-            val offset by remember {
-                derivedStateOf { state.indexWithOffset?.takeIf { it.first == idx }?.second }
-            }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(100.dp)
-                    .draggedItem(offset, Orientation.Horizontal)
+                    .draggedItem(if (state.index == idx) state.offset else null, Orientation.Horizontal)
+                    .scale(if (state.index == null || state.index == idx) 1f else .9f)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colors.primary)
             ) {
@@ -85,30 +93,48 @@ fun HorizontalReorderList(
 fun VerticalReorderList(
     modifier: Modifier = Modifier,
     items: SnapshotStateList<ItemData>,
-    listState: LazyListState = rememberLazyListState()
+    state: ReorderableState,
 ) {
-    val state: ReorderableState = rememberReorderState(listState)
     LazyColumn(
-        state = listState,
+        state = state.listState,
         modifier = Modifier
-            .reorderable(state, items)
+            .reorderable(state)
             .then(modifier)
     ) {
         itemsIndexed(items) { idx, item ->
-            val offset by remember {
-                derivedStateOf { state.indexWithOffset?.takeIf { it.first == idx }?.second }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .draggedItem(offset)
-                    .background(MaterialTheme.colors.surface)
-            ) {
-                Text(
-                    text = item.title,
-                    modifier = Modifier.padding(24.dp)
-                )
-                Divider()
+            if (item.isLocked) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.LightGray)
+                ) {
+                    Text(
+                        text = item.title,
+                        modifier = Modifier.padding(24.dp)
+                    )
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .draggedItem(if (state.index == idx) state.offset else null)
+                        .background(MaterialTheme.colors.surface)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Image(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = ""
+                        )
+                        Text(
+                            text = item.title,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                    Divider()
+                }
             }
         }
     }

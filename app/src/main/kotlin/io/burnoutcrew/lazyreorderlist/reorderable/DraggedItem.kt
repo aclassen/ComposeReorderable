@@ -26,7 +26,7 @@ import androidx.compose.ui.zIndex
 @SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.draggedItem(
     offset: Float?,
-    orientation: Orientation = Orientation.Vertical
+    orientation: Orientation = Orientation.Vertical,
 ): Modifier = composed {
     Modifier
         .zIndex(offset?.let { 1f } ?: 0f)

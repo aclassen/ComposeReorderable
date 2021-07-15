@@ -20,5 +20,35 @@ import androidx.lifecycle.ViewModel
 
 class ReorderListViewModel : ViewModel() {
     val cats = List(500) { ItemData("Cat $it") }.toMutableStateList()
-    val dogs = List(500) { ItemData("Dog $it") }.toMutableStateList()
+    val dogs = List(500) {
+        if (it.mod(10) == 0) ItemData("Locked", true) else ItemData("Dog $it")
+    }.toMutableStateList()
+
+    fun moveCat(from: Int, to: Int) {
+        cats.move(from, to)
+    }
+
+    fun moveDog(from: Int, to: Int) {
+        dogs.move(from, to)
+    }
+
+    fun isDogDragEnabled(idx: Int) = dogs.getOrNull(idx)?.isLocked != true
+}
+
+fun <T> MutableList<T>.move(fromIdx: Int, toIdx: Int) {
+    when {
+        fromIdx == toIdx -> {
+            return
+        }
+        toIdx > fromIdx -> {
+            for (i in fromIdx until toIdx) {
+                this[i] = this[i + 1].also { this[i + 1] = this[i] }
+            }
+        }
+        else -> {
+            for (i in fromIdx downTo toIdx + 1) {
+                this[i] = this[i - 1].also { this[i - 1] = this[i] }
+            }
+        }
+    }
 }
