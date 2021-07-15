@@ -19,12 +19,8 @@ Apply the offset to your item layout :
 
 ```
 itemsIndexed(items) { idx, item ->
-    val offset by remember {
-        derivedStateOf { state.indexWithOffset?.takeIf { it.first == idx }?.second }
-    }
-
     Column(
-        modifier = Modifier.draggedItem(offset)
+        modifier = Modifier.draggedItem(if (state.index == idx) state.offset else null)
     ) {
         ...
     }
