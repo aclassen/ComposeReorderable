@@ -8,10 +8,9 @@ A reorderable list built with Jetpack Compose.
 Create your LazyColumn or LazyRow:
 
 ```
-val listState: LazyListState = rememberLazyListState()
-val state: ReorderableState = rememberReorderState(listState)
+val state: ReorderableState = rememberReorderState { from, to -> data.move(from, to) }
 LazyColumn(
-    state = listState,
+    state = state.listState,
     modifier = Modifier.reorderable(state, items))
 ```
 
