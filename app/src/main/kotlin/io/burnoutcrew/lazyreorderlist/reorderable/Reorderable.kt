@@ -27,13 +27,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.reorderable(
     state: ReorderableState,
     orientation: Orientation = Orientation.Vertical,
-    maxScrollPerFrame: Dp = 25.dp,
+    maxScrollPerFrame: Dp = 20.dp,
 ): Modifier = composed {
     val scope = rememberCoroutineScope()
     val job = remember { mutableStateOf<Job?>(null) }
@@ -65,7 +66,7 @@ fun Modifier.reorderable(
                         job.value = scope.launch {
                             var scroll = it
                             var start = 0L
-                            while (scroll != 0f) {
+                            while (scroll != 0f && isActive) {
                                 withFrameMillis {
                                     if (start == 0L) {
                                         start = it

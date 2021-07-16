@@ -124,7 +124,11 @@ class ReorderableState(
         }
     }
 
-    private fun chooseDropIndex(items: List<LazyListItemInfo>, curStart: Float, curEnd: Float): Int? =
+    private fun chooseDropIndex(
+        items: List<LazyListItemInfo>,
+        curStart: Float,
+        curEnd: Float
+    ): Int? =
         draggedItem?.let { draggedItem ->
             var targetIndex: Int? = null
             val distance = curStart - draggedItem.offset
@@ -158,10 +162,17 @@ class ReorderableState(
             it * it * it * it * it
         }
 
-        fun interpolateOutOfBoundsScroll(viewSize: Int, viewSizeOutOfBounds: Float, time: Long, maxScroll: Float): Float {
+        fun interpolateOutOfBoundsScroll(
+            viewSize: Int,
+            viewSizeOutOfBounds: Float,
+            time: Long,
+            maxScroll: Float
+        ): Float {
             val outOfBoundsRatio = min(1f, 1f * viewSizeOutOfBounds.absoluteValue / viewSize)
-            val cappedScroll = sign(viewSizeOutOfBounds) * maxScroll * EaseOutQuadInterpolator(outOfBoundsRatio)
-            val timeRatio = if (time > ACCELERATION_LIMIT_TIME_MS) 1f else time.toFloat() / ACCELERATION_LIMIT_TIME_MS
+            val cappedScroll =
+                sign(viewSizeOutOfBounds) * maxScroll * EaseOutQuadInterpolator(outOfBoundsRatio)
+            val timeRatio =
+                if (time > ACCELERATION_LIMIT_TIME_MS) 1f else time.toFloat() / ACCELERATION_LIMIT_TIME_MS
             return (cappedScroll * EaseInQuintInterpolator(timeRatio)).let {
                 if (it == 0f) {
                     if (viewSizeOutOfBounds > 0) 1f else -1f

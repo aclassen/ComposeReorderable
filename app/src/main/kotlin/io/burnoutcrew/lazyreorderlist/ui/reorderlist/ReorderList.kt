@@ -30,7 +30,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,14 +55,15 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
             state = rememberReorderState(
                 canDragOver = { vm.isDogDragEnabled(it) },
                 isDragEnabled = { vm.isDogDragEnabled(it) },
-                onMove = { from, to -> vm.moveDog(from, to) }))
+                onMove = { from, to -> vm.moveDog(from, to) })
+        )
     }
 }
 
 @Composable
 fun HorizontalReorderList(
     modifier: Modifier = Modifier,
-    items: SnapshotStateList<ItemData>,
+    items: List<ItemData>,
     state: ReorderableState,
 ) {
     LazyRow(
@@ -78,7 +78,10 @@ fun HorizontalReorderList(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(100.dp)
-                    .draggedItem(if (state.index == idx) state.offset else null, Orientation.Horizontal)
+                    .draggedItem(
+                        offset = if (state.index == idx) state.offset else null,
+                        orientation = Orientation.Horizontal
+                    )
                     .scale(if (state.index == null || state.index == idx) 1f else .9f)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colors.primary)
@@ -92,7 +95,7 @@ fun HorizontalReorderList(
 @Composable
 fun VerticalReorderList(
     modifier: Modifier = Modifier,
-    items: SnapshotStateList<ItemData>,
+    items: List<ItemData>,
     state: ReorderableState,
 ) {
     LazyColumn(

@@ -17,6 +17,7 @@ package io.burnoutcrew.lazyreorderlist.ui.reorderlist
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import io.burnoutcrew.lazyreorderlist.reorderable.move
 
 class ReorderListViewModel : ViewModel() {
     val cats = List(500) { ItemData("Cat $it") }.toMutableStateList()
@@ -33,22 +34,4 @@ class ReorderListViewModel : ViewModel() {
     }
 
     fun isDogDragEnabled(idx: Int) = dogs.getOrNull(idx)?.isLocked != true
-}
-
-fun <T> MutableList<T>.move(fromIdx: Int, toIdx: Int) {
-    when {
-        fromIdx == toIdx -> {
-            return
-        }
-        toIdx > fromIdx -> {
-            for (i in fromIdx until toIdx) {
-                this[i] = this[i + 1].also { this[i + 1] = this[i] }
-            }
-        }
-        else -> {
-            for (i in fromIdx downTo toIdx + 1) {
-                this[i] = this[i - 1].also { this[i - 1] = this[i] }
-            }
-        }
-    }
 }
