@@ -7,4 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "LazyReorderList"
 include(":app")
- 
+include(":reorderable")

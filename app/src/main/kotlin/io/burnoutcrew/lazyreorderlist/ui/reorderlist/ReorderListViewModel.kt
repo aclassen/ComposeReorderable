@@ -17,7 +17,7 @@ package io.burnoutcrew.lazyreorderlist.ui.reorderlist
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import io.burnoutcrew.lazyreorderlist.reorderable.move
+import io.burnoutcrew.reorderable.move
 
 class ReorderListViewModel : ViewModel() {
     val cats = List(500) { ItemData("Cat $it") }.toMutableStateList()

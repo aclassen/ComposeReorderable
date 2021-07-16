@@ -37,10 +37,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.burnoutcrew.lazyreorderlist.reorderable.ReorderableState
-import io.burnoutcrew.lazyreorderlist.reorderable.draggedItem
-import io.burnoutcrew.lazyreorderlist.reorderable.rememberReorderState
-import io.burnoutcrew.lazyreorderlist.reorderable.reorderable
+import io.burnoutcrew.reorderable.ReorderableState
+import io.burnoutcrew.reorderable.draggedItem
+import io.burnoutcrew.reorderable.rememberReorderState
+import io.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun ReorderList(vm: ReorderListViewModel = viewModel()) {
