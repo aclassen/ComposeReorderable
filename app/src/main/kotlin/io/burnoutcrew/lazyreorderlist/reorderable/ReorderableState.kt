@@ -28,19 +28,21 @@ import kotlin.math.sign
 @Composable
 fun rememberReorderState(
     listState: LazyListState = rememberLazyListState(),
-    canDragOver: (Int) -> Boolean = { true },
-    isDragEnabled: (Int) -> Boolean = { true },
-    onMove: (Int, Int) -> (Unit),
+    onMove: (fromPos: Int, toPos: Int) -> (Unit),
+    canDragOver: ((index: Int) -> Boolean)? = null,
+    isDragEnabled: ((index: Int) -> Boolean)? = null,
+    onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
 ): ReorderableState =
     remember {
-        ReorderableState(listState, canDragOver, isDragEnabled, onMove)
+        ReorderableState(listState, onMove, canDragOver, isDragEnabled, onDragEnd)
     }
 
 class ReorderableState(
     val listState: LazyListState,
-    private val canDragOver: (Int) -> Boolean = { true },
-    private val isDragEnabled: (Int) -> Boolean = { true },
-    private val onMove: (Int, Int) -> (Unit),
+    private val onMove: (fromIndex: Int, toIndex: Int) -> (Unit),
+    private val canDragOver: ((index: Int) -> Boolean)? = null,
+    private val isDragEnabled: ((index: Int) -> Boolean)? = null,
+    private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
 ) {
     private fun LazyListItemInfo.offsetEnd() =
         offset + size
@@ -66,7 +68,7 @@ class ReorderableState(
     fun startDrag(offset: Int) =
         listState.layoutInfo.visibleItemsInfo
             .firstOrNull { offset in it.offset..it.offsetEnd() }
-            ?.takeIf { isDragEnabled(it.index) }
+            ?.takeIf { isDragEnabled?.invoke(it.index) != false }
             ?.also { info ->
                 selected = info
                 index = info.index
@@ -81,10 +83,17 @@ class ReorderableState(
         return false
     }
 
-    fun cancelDrag() {
+    fun endDrag() {
+        val startIndex = selected?.index
+        val endIndex = index
         index = null
         selected = null
         movedDist = 0f
+        onDragEnd?.apply {
+            if (startIndex != null && endIndex != null) {
+                invoke(startIndex, endIndex)
+            }
+        }
     }
 
     suspend fun scrollBy(value: Float) =
@@ -115,7 +124,7 @@ class ReorderableState(
                 chooseDropIndex(
                     listState.layoutInfo.visibleItemsInfo
                         .filterNot { it.offsetEnd() < start || it.offset > end || it.index == draggedItem.index }
-                        .filter { canDragOver(it.index) }, start, end
+                        .filter { canDragOver?.invoke(it.index) != false }, start, end
                 )?.also { targetIdx ->
                     onMove(draggedItem.index, targetIdx)
                     index = targetIdx
@@ -127,7 +136,7 @@ class ReorderableState(
     private fun chooseDropIndex(
         items: List<LazyListItemInfo>,
         curStart: Float,
-        curEnd: Float
+        curEnd: Float,
     ): Int? =
         draggedItem?.let { draggedItem ->
             var targetIndex: Int? = null
@@ -166,7 +175,7 @@ class ReorderableState(
             viewSize: Int,
             viewSizeOutOfBounds: Float,
             time: Long,
-            maxScroll: Float
+            maxScroll: Float,
         ): Float {
             val outOfBoundsRatio = min(1f, 1f * viewSizeOutOfBounds.absoluteValue / viewSize)
             val cappedScroll =

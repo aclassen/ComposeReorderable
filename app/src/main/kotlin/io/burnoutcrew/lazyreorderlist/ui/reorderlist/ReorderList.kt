@@ -47,15 +47,16 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     Column {
         HorizontalReorderList(
             items = vm.cats,
-            state = rememberReorderState { from, to -> vm.moveCat(from, to) },
-            modifier = Modifier.padding(vertical = 16.dp)
+            state = rememberReorderState(onMove = { from, to -> vm.moveCat(from, to) }),
+            modifier = Modifier.padding(vertical = 16.dp),
         )
         VerticalReorderList(
             items = vm.dogs,
             state = rememberReorderState(
+                onMove = { from, to -> vm.moveDog(from, to) },
                 canDragOver = { vm.isDogDragEnabled(it) },
                 isDragEnabled = { vm.isDogDragEnabled(it) },
-                onMove = { from, to -> vm.moveDog(from, to) })
+            )
         )
     }
 }

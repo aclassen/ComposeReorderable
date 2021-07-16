@@ -46,11 +46,11 @@ fun Modifier.reorderable(
             },
             onDragEnd = {
                 job.value?.cancel()
-                state.cancelDrag()
+                state.endDrag()
             },
             onDragCancel = {
                 job.value?.cancel()
-                state.cancelDrag()
+                state.endDrag()
             },
             onDrag = { change, dragAmount ->
                 change.consumeAllChanges()
