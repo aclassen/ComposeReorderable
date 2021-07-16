@@ -1,7 +1,24 @@
-# Lazy reorder list
+# Compose LazyList reorder
+[![](https://jitpack.io/v/aclassen/ComposeReorderable.svg)](https://jitpack.io/#aclassen/ComposeReorderable)
+
+A Jetpack Compose modifier enabling reordering in a LazyList.
+
 ![Sample](readme/sample.gif)
 
-A reorderable list built with Jetpack Compose.
+## Download
+
+```
+repositories {
+    maven { setUrl("https://jitpack.io") }
+    // maven { url 'https://jitpack.io' } 
+}
+
+
+dependencies {
+    implementation("com.github.aclassen:ComposeReorderable:<latest_version>")
+}
+```
+
 
 ## How to use
 
