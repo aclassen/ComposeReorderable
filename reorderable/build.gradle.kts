@@ -1,21 +1,18 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id ("maven-publish")
+    id("maven-publish")
 }
 
 android {
-    compileSdk = 30
-
+    compileSdk = Versions.compile_sdk
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 30
+        minSdk = Versions.min_sdk
+        targetSdk = Versions.target_sdk
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
-
 
     buildTypes {
         getByName("release") {
@@ -39,15 +36,16 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = rootProject.extra["compose_version"] as String
+        kotlinCompilerExtensionVersion = Versions.compose
     }
 }
 
 dependencies {
-    implementation("androidx.compose.material:material:${rootProject.extra["compose_version"]}")
-    testImplementation("junit:junit:4.+")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    implementation(Deps.Compose.material)
+    testImplementation(Deps.junit)
+    androidTestImplementation(Deps.AndroidXTest.junit)
+    androidTestImplementation(Deps.AndroidXTest.espresso_core)
+
 }
 
 sourceSets.create("main") {
