@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "io.burnoutcrew.lazyreorderlist"
-        minSdk = 23
+        minSdk = 21
         targetSdk = 30
         versionCode = 1
         versionName = "1.0"
