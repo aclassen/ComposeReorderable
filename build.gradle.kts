@@ -1,12 +1,14 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    val minVersion by extra(21)
+    val targetSdk by extra(30)
+    val compileSdk by extra(30)
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath(Deps.android_gradle_plugin)
-        classpath(kotlin("gradle-plugin", Versions.kotlin))
+        classpath("com.android.tools.build:gradle:7.1.0-alpha03")
+        classpath(kotlin("gradle-plugin", "1.5.10"))
     }
 }
 

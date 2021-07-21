@@ -4,12 +4,14 @@ plugins {
 }
 
 android {
-    compileSdk = Versions.compile_sdk
+    compileSdk = rootProject.extra.get("compileSdk") as Int
+
 
     defaultConfig {
         applicationId = "io.burnoutcrew.lazyreorderlist"
-        minSdk = Versions.min_sdk
-        targetSdk = Versions.target_sdk
+        minSdk =  rootProject.extra.get("minVersion") as Int
+        targetSdk = rootProject.extra.get("targetSdk") as Int
+
         versionCode = 1
         versionName = "1.0"
 
@@ -37,20 +39,15 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
 }
 
 dependencies {
     implementation(project(mapOf("path" to ":reorderable")))
-    implementation(Deps.material)
-    implementation(Deps.lifecycle_viewmodel)
-    implementation(Deps.Compose.ui)
-    implementation(Deps.Compose.material)
-    implementation(Deps.Compose.activity)
-    implementation(Deps.Compose.lifecycle_viewmodel)
-    testImplementation(Deps.junit)
-    androidTestImplementation(Deps.AndroidXTest.junit)
-    androidTestImplementation(Deps.AndroidXTest.espresso_core)
-    androidTestImplementation(Deps.AndroidXTest.ui_test)
+    implementation(libs.material)
+    implementation(libs.androidx.viewmodel)
+    implementation(libs.bundles.compose)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.bundles.androidx.test)
 }
