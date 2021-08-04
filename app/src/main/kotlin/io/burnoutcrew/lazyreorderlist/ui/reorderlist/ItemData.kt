@@ -18,4 +18,4 @@ package io.burnoutcrew.lazyreorderlist.ui.reorderlist
 import androidx.compose.runtime.Stable
 
 @Stable
-data class ItemData(val title: String, val isLocked: Boolean = false)
+data class ItemData(val title: String, val key: String, val isLocked: Boolean = false)

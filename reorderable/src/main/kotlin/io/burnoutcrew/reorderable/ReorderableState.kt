@@ -52,15 +52,16 @@ class ReorderableState(
 
     private var selected by mutableStateOf<LazyListItemInfo?>(null)
     private var movedDist by mutableStateOf(0f)
-    private val draggedItem get() = index?.let { listState.layoutInfo.itemInfoByIndex(it) }
+    private val draggedItem get() = draggedIndex?.let { listState.layoutInfo.itemInfoByIndex(it) }
     private val viewportStartOffset get() = listState.layoutInfo.viewportStartOffset.toFloat()
     private val viewportEndOffset get() = listState.layoutInfo.viewportEndOffset.toFloat()
 
-    var index by mutableStateOf<Int?>(null)
+    val draggedKey by derivedStateOf { selected?.key }
+    var draggedIndex by mutableStateOf<Int?>(null)
         internal set
 
-    val offset by derivedStateOf {
-        index
+    val draggedOffset by derivedStateOf {
+        draggedIndex
             ?.let { listState.layoutInfo.itemInfoByIndex(it) }
             ?.let { (selected?.offset?.toFloat() ?: 0f) + movedDist - it.offset }
     }
@@ -71,11 +72,11 @@ class ReorderableState(
             ?.takeIf { isDragEnabled?.invoke(it.index) != false }
             ?.also { info ->
                 selected = info
-                index = info.index
+                draggedIndex = info.index
             }
 
-    fun dragBy(amount: Float): Boolean {
-        if (index != null) {
+    suspend fun dragBy(amount: Float): Boolean {
+        if (draggedIndex != null) {
             movedDist += amount
             checkIfMoved()
             return true
@@ -85,8 +86,8 @@ class ReorderableState(
 
     fun endDrag() {
         val startIndex = selected?.index
-        val endIndex = index
-        index = null
+        val endIndex = draggedIndex
+        draggedIndex = null
         selected = null
         movedDist = 0f
         onDragEnd?.apply {
@@ -114,7 +115,7 @@ class ReorderableState(
                 ?.let { interpolateOutOfBoundsScroll(selected.size, it, time, maxScroll) }
         } ?: 0f
 
-    private fun checkIfMoved() {
+    private suspend fun checkIfMoved() {
         selected?.also { selected ->
             val start = (movedDist + selected.offset)
                 .coerceIn(viewportStartOffset - selected.size, viewportEndOffset)
@@ -127,7 +128,8 @@ class ReorderableState(
                         .filter { canDragOver?.invoke(it.index) != false }, start, end
                 )?.also { targetIdx ->
                     onMove(draggedItem.index, targetIdx)
-                    index = targetIdx
+                    draggedIndex = targetIdx
+                    listState.scrollToItem(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
                 }
             }
         }

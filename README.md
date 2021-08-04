@@ -34,9 +34,22 @@ LazyColumn(
 Apply the offset to your item layout :
 
 ```
+
+items(items, { it.key }) {item ->
+    Column(
+        modifier = Modifier.draggedItem(state.draggedOffset.takeIf { state.draggedKey == item.key })
+    ) {
+        ...
+    }
+}
+```
+
+without keyed items:
+
+```
 itemsIndexed(items) { idx, item ->
     Column(
-        modifier = Modifier.draggedItem(state.offset.takeIf { state.index == idx })
+        modifier = Modifier.draggedItem(state.draggedOffset.takeIf { state.draggedIndex == idx })
     ) {
         ...
     }
@@ -46,7 +59,7 @@ Use `draggedItem` for a default dragged effect or create your own.
 
 ## Notes
 
-**Don`t use keyed items cause in this case the LazyList will [keep the scroll position based on the key](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/package-summary#(androidx.compose.foundation.lazy.LazyListScope).items(kotlin.collections.List,kotlin.Function1,kotlin.Function2))**
+It`s recommended to use keyed items, especially if item size is not equal. 
 
 When dragging, the existing item will be modified.
 Because if this reason it`s important that the item must be part of the LazyList visible items all the time.

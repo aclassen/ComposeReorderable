@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -80,10 +81,10 @@ fun HorizontalReorderList(
                 modifier = Modifier
                     .size(100.dp)
                     .draggedItem(
-                        offset = if (state.index == idx) state.offset else null,
+                        offset = if (state.draggedIndex == idx) state.draggedOffset else null,
                         orientation = Orientation.Horizontal
                     )
-                    .scale(if (state.index == null || state.index == idx) 1f else .9f)
+                    .scale(if (state.draggedIndex == null || state.draggedIndex == idx) 1f else .9f)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colors.primary)
             ) {
@@ -105,7 +106,7 @@ fun VerticalReorderList(
             .reorderable(state)
             .then(modifier)
     ) {
-        itemsIndexed(items) { idx, item ->
+        items(items, { it.key }) { item ->
             if (item.isLocked) {
                 Column(
                     modifier = Modifier
@@ -121,7 +122,7 @@ fun VerticalReorderList(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .draggedItem(if (state.index == idx) state.offset else null)
+                        .draggedItem(if (state.draggedKey == item.key) state.draggedOffset else null)
                         .background(MaterialTheme.colors.surface)
                 ) {
                     Row(
