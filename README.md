@@ -1,4 +1,5 @@
 # Compose LazyList reorder
+
 [![](https://jitpack.io/v/aclassen/ComposeReorderable.svg)](https://jitpack.io/#aclassen/ComposeReorderable)
 
 A Jetpack Compose modifier enabling reordering in a LazyList.
@@ -18,7 +19,6 @@ dependencies {
     implementation("com.github.aclassen:ComposeReorderable:<latest_version>")
 }
 ```
-
 
 ## How to use
 
@@ -53,8 +53,8 @@ Make an item reorderable by adding at least one drag modifier to the item:
  Modifier.detectReorderAfterLongPress(state, { item.key })
 ```
 
-
-If you want to use a non keyed item list `detectReorder` and `detectReorderAfterLongPress` will not work , use the `detectListReorder` modifier instead.
+If you want to use a non keyed item list `detectReorder` and `detectReorderAfterLongPress` will not work , use the `detectListReorder`
+modifier instead.
 
 Add this modifier to your LazyList , this will make the items reorderable after long press.
 
@@ -67,11 +67,14 @@ LazyRow(
     ) 
 ```
 
-Use `draggedItem` for a default dragged effect or create your own.
+Use the item index, instead of the key , to find the offset `state.offsetOf(idx)`
+
+You can use `draggedItem` for a default dragged effect or create your own.
 
 ## Notes
-When dragging, the existing item will be modified.
-Because if this reason it`s important that the item must be part of the LazyList visible items all the time.
+
+When dragging, the existing item will be modified. Because if this reason it`s important that the item must be part of the LazyList visible
+items all the time.
 
 This can be problematic if no drop target can be found during scrolling.
 
