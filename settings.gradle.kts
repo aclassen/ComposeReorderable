@@ -13,7 +13,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
-            version("compose", "1.0.0")
+            version("compose", "1.0.1")
 
             alias("material").to("com.google.android.material", "material").version("1.4.0")
             alias("androidx_viewmodel").to("androidx.lifecycle", "lifecycle-viewmodel-ktx").version("2.3.1")
@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             alias("compose_viewmodel").to("androidx.lifecycle", "lifecycle-viewmodel-compose").version("1.0.0-alpha07")
             alias("compose_ui").to("androidx.compose.ui", "ui").versionRef("compose")
             alias("compose_material").to("androidx.compose.material", "material").versionRef("compose")
-            alias("compose_activity").to("androidx.activity", "activity-compose").version("1.3.0")
+            alias("compose_activity").to("androidx.activity", "activity-compose").version("1.3.1")
 
             alias("junit").to("junit", "junit").version("4.13.2")
             alias("androidx_test_junit").to("androidx.test.ext", "junit").version("1.1.3")

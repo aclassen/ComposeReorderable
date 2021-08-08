@@ -38,26 +38,20 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.burnoutcrew.reorderable.ReorderableState
-import io.burnoutcrew.reorderable.draggedItem
-import io.burnoutcrew.reorderable.rememberReorderState
-import io.burnoutcrew.reorderable.reorderable
+import io.burnoutcrew.reorderable.*
 
 @Composable
 fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     Column {
         HorizontalReorderList(
             items = vm.cats,
-            state = rememberReorderState(onMove = { from, to -> vm.moveCat(from, to) }),
             modifier = Modifier.padding(vertical = 16.dp),
+            onMove = { from, to -> vm.moveCat(from, to) },
         )
         VerticalReorderList(
             items = vm.dogs,
-            state = rememberReorderState(
-                onMove = { from, to -> vm.moveDog(from, to) },
-                canDragOver = { vm.isDogDragEnabled(it) },
-                isDragEnabled = { vm.isDogDragEnabled(it) },
-            )
+            onMove = { from, to -> vm.moveDog(from, to) },
+            canDragOver = { vm.isDogDragEnabled(it) },
         )
     }
 }
@@ -66,13 +60,15 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
 fun HorizontalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
-    state: ReorderableState,
+    state: ReorderableState = rememberReorderState(),
+    onMove: (fromPos: Int, toPos: Int) -> (Unit),
 ) {
+    Reorderable(state, onMove)
     LazyRow(
         state = state.listState,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .reorderable(state, Orientation.Horizontal)
+            .detectListReorder(state, Orientation.Horizontal)
             .then(modifier),
     ) {
         itemsIndexed(items) { idx, item ->
@@ -81,7 +77,7 @@ fun HorizontalReorderList(
                 modifier = Modifier
                     .size(100.dp)
                     .draggedItem(
-                        offset = if (state.draggedIndex == idx) state.draggedOffset else null,
+                        offset = state.offsetOf(idx),
                         orientation = Orientation.Horizontal
                     )
                     .scale(if (state.draggedIndex == null || state.draggedIndex == idx) 1f else .9f)
@@ -98,13 +94,14 @@ fun HorizontalReorderList(
 fun VerticalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
-    state: ReorderableState,
+    state: ReorderableState = rememberReorderState(),
+    onMove: (fromPos: Int, toPos: Int) -> (Unit),
+    canDragOver: ((index: Int) -> Boolean),
 ) {
+    Reorderable(state, onMove, canDragOver)
     LazyColumn(
         state = state.listState,
-        modifier = Modifier
-            .reorderable(state)
-            .then(modifier)
+        modifier = modifier
     ) {
         items(items, { it.key }) { item ->
             if (item.isLocked) {
@@ -122,7 +119,7 @@ fun VerticalReorderList(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .draggedItem(if (state.draggedKey == item.key) state.draggedOffset else null)
+                        .draggedItem(state.offsetOf(item.key))
                         .background(MaterialTheme.colors.surface)
                 ) {
                     Row(
@@ -131,7 +128,8 @@ fun VerticalReorderList(
                     ) {
                         Image(
                             imageVector = Icons.Filled.Menu,
-                            contentDescription = ""
+                            contentDescription = "",
+                            modifier = Modifier.detectReorder(state, { item.key })
                         )
                         Text(
                             text = item.title,

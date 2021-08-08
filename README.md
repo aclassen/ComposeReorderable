@@ -22,45 +22,54 @@ dependencies {
 
 ## How to use
 
-Create your LazyColumn or LazyRow:
+Add a `Reorderable` to your composition:
 
 ```
-val state: ReorderableState = rememberReorderState { from, to -> data.move(from, to) }
-LazyColumn(
-    state = state.listState,
-    modifier = Modifier.reorderable(state, items))
+val state: ReorderableState = rememberReorderState()
+
+Reorderable(state, { from, to -> data.move(from, to) })
+LazyColumn(state = state.listState) {
+...
+}
 ```
 
-Apply the offset to your item layout :
+To apply the dragged item offset:
 
 ```
-
 items(items, { it.key }) {item ->
     Column(
-        modifier = Modifier.draggedItem(state.draggedOffset.takeIf { state.draggedKey == item.key })
+        modifier = Modifier.draggedItem(state.offsetOf(item.key))
     ) {
         ...
     }
 }
 ```
 
-without keyed items:
+Make an item reorderable by adding at least one drag modifier to the item:
 
 ```
-itemsIndexed(items) { idx, item ->
-    Column(
-        modifier = Modifier.draggedItem(state.draggedOffset.takeIf { state.draggedIndex == idx })
-    ) {
-        ...
-    }
-}
+ Modifier.detectReorder(state, { item.key })
+ or
+ Modifier.detectReorderAfterLongPress(state, { item.key })
 ```
+
+
+If you want to use a non keyed item list `detectReorder` and `detectReorderAfterLongPress` will not work , use the `detectListReorder` modifier instead.
+
+Add this modifier to your LazyList , this will make the items reorderable after long press.
+
+```
+Reorderable(state, { from, to -> data.move(from, to) })
+LazyRow(
+    state = state.listState,
+    modifier = Modifier
+        .detectListReorder(state),
+    ) 
+```
+
 Use `draggedItem` for a default dragged effect or create your own.
 
 ## Notes
-
-It`s recommended to use keyed items, especially if item size is not equal. 
-
 When dragging, the existing item will be modified.
 Because if this reason it`s important that the item must be part of the LazyList visible items all the time.
 

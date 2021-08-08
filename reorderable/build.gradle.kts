@@ -4,10 +4,8 @@ plugins {
     id("maven-publish")
 }
 
-
 android {
     compileSdk = rootProject.extra.get("compileSdk") as Int
-
 
     defaultConfig {
         minSdk =  rootProject.extra.get("minVersion") as Int
@@ -64,7 +62,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("debug") {
                 groupId = "com.github.aclassen"
-                version = "0.1"
+                version = "0.3"
                 from(components["debug"])
                 artifact(sourcesJar)
             }
