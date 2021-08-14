@@ -5,13 +5,21 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+
     dependencies {
-        classpath("com.android.tools.build:gradle:7.1.0-alpha03")
-        classpath(kotlin("gradle-plugin", "1.5.21"))
+        classpath("org.jetbrains.compose:compose-gradle-plugin:1.0.0-alpha3")
+        classpath("com.android.tools.build:gradle:4.2.2")
+        classpath(kotlin("gradle-plugin", version = "1.5.21"))
     }
 }
 
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+allprojects {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
 }

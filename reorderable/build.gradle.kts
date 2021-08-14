@@ -1,7 +1,30 @@
+import org.jetbrains.compose.ComposeBuildConfig.composeVersion
+import org.jetbrains.compose.compose
+
 plugins {
     id("com.android.library")
-    id("kotlin-android")
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
     id("maven-publish")
+    id("signing")
+}
+
+group = "org.burnoutcrew.composereorderable"
+version = "0.6"
+
+kotlin {
+    android {
+        publishLibraryVariants( "debug")
+    }
+    jvm("desktop")
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                compileOnly(compose.foundation)
+                compileOnly("org.jetbrains.compose.ui:ui-util:${composeVersion}")
+            }
+        }
+    }
 }
 
 android {
@@ -10,62 +33,70 @@ android {
     defaultConfig {
         minSdk =  rootProject.extra.get("minVersion") as Int
         targetSdk = rootProject.extra.get("targetSdk") as Int
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-        }
-
-        getByName("debug") {
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+    sourceSets {
+        val main by getting {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        }
     }
 }
-
-dependencies {
-    implementation(libs.compose.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
+val javadocJar = tasks.register("javadocJar", Jar::class.java) {
+    archiveClassifier.set("javadoc")
 }
 
-sourceSets.create("main") {
-    java.srcDir("src/main/kotlin")
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.convention("sources")
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("debug") {
-                groupId = "com.github.aclassen"
-                version = "0.3"
-                from(components["debug"])
-                artifact(sourcesJar)
+publishing {
+    publications {
+        repositories {
+            maven {
+                name="oss"
+                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+                credentials {
+                    username = extra["ossrh.Username"] as? String
+                    password = extra["ossrh.Password"] as? String
+                }
             }
         }
     }
+    publications {
+        withType<MavenPublication> {
+            artifact(javadocJar)
+            pom {
+                name.set("ComposeReorderable")
+                description.set("Reorderable Compose LazyList")
+                licenses {
+                    license {
+                        name.set("Apache-2.0")
+                        url.set("https://opensource.org/licenses/Apache-2.0")
+                    }
+                }
+                url.set("https://github.com/aclassen/ComposeReorderable")
+                issueManagement {
+                    system.set("Github")
+                    url.set("https://github.com/aclassen/ComposeReorderable/issues")
+                }
+                scm {
+                    connection.set("https://github.com/aclassen/ComposeReorderable.git")
+                    url.set("https://github.com/aclassen/ComposeReorderableI")
+                }
+                developers {
+                    developer {
+                        name.set("Andre Claßen")
+                        email.set("andreclassen1337@gmail.com")
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications)
 }
