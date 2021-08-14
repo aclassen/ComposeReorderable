@@ -1,39 +1,43 @@
 # Compose LazyList reorder
 
-[![](https://jitpack.io/v/aclassen/ComposeReorderable.svg)](https://jitpack.io/#aclassen/ComposeReorderable)
 
-A Jetpack Compose modifier enabling reordering in a LazyList.
+A Jetpack Compose (Desktop) modifier enabling reordering in a LazyList.
 
 ![Sample](readme/sample.gif)
 
 ## Download
 
 ```
-repositories {
-    maven { setUrl("https://jitpack.io") }
-    // maven { url 'https://jitpack.io' } 
-}
-
-
 dependencies {
-    implementation("com.github.aclassen:ComposeReorderable:<latest_version>")
+    implementation("org.burnoutcrew.composereorderable:reorderable:<latest_version>")
 }
 ```
 
 ## How to use
 
-Add a `Reorderable` to your composition:
+Create `reorderState` and add the `reorderable` Modifier to the LazyList:
 
 ```
-val state: ReorderableState = rememberReorderState()
+val state = rememberReorderState()
 
-Reorderable(state, { from, to -> data.move(from, to) })
-LazyColumn(state = state.listState) {
+LazyColumn(
+    state = state.listState,
+    modifier = Modifier.reorderable(state, { from, to -> data.move(from, to) })) {
 ...
 }
 ```
 
-To apply the dragged item offset:
+To make an item reorderable/draggable add at least one drag modifier to the item:
+
+```
+ Modifier.detectReorder(state)
+ or
+ Modifier.detectReorderAfterLongPress(state)
+```
+
+> Adding one of the detect modifiers to the LazyList instead of an item , will make all items reordable.
+
+At least apply the dragged item offset:
 
 ```
 items(items, { it.key }) {item ->
@@ -43,33 +47,44 @@ items(items, { it.key }) {item ->
         ...
     }
 }
+
+or without keyed items:
+
+itemsIndexed(items) { idx, item ->
+    Column(
+        modifier = Modifier.draggedItem(state.offsetOf(idx))
+    ) {
+        ...
+    }
+}
 ```
 
-Make an item reorderable by adding at least one drag modifier to the item:
+> You can use `draggedItem` for a default dragged effect or create your own.
 
+Complete example:
 ```
- Modifier.detectReorder(state, { item.key })
- or
- Modifier.detectReorderAfterLongPress(state, { item.key })
+@Composable
+fun ReorderableList(){
+    val state = rememberReorderState()
+    val data = List(100) { "item $it" }.toMutableStateList()
+    LazyColumn(
+        state = state.listState,
+        modifier = Modifier.reorderable(state, { a, b -> data.move(a, b) })
+    ) {
+        items(data, { it }) { item ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .draggedItem(state.offsetOf(item))
+                    .detectReorderAfterLongPress(state)
+            ) {
+                Text(text = item)
+            }
+        }
+    }
+}
 ```
 
-If you want to use a non keyed item list `detectReorder` and `detectReorderAfterLongPress` will not work , use the `detectListReorder`
-modifier instead.
-
-Add this modifier to your LazyList , this will make the items reorderable after long press.
-
-```
-Reorderable(state, { from, to -> data.move(from, to) })
-LazyRow(
-    state = state.listState,
-    modifier = Modifier
-        .detectListReorder(state),
-    ) 
-```
-
-Use the item index, instead of the key , to find the offset `state.offsetOf(idx)`
-
-You can use `draggedItem` for a default dragged effect or create your own.
 
 ## Notes
 
