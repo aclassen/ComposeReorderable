@@ -57,7 +57,7 @@ fun VerticalReorderList(
             modifier = Modifier.reorderable(state, onMove)) {
             items(items, { it }) { item ->
                 Column(
-                    modifier = Modifier.draggedItem(state.offsetOf(item))
+                    modifier = Modifier.draggedItem(state.offsetByKey(item))
                         .background(MaterialTheme.colors.surface)
                 ) {
                     Row(

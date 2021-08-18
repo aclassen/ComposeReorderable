@@ -76,7 +76,7 @@ fun HorizontalReorderList(
                 modifier = Modifier
                     .size(100.dp)
                     .draggedItem(
-                        offset = state.offsetOf(idx),
+                        offset = state.offsetByIndex(idx),
                         orientation = Orientation.Horizontal
                     )
                     .scale(if (state.draggedIndex == null || state.draggedIndex == idx) 1f else .9f)
@@ -119,7 +119,7 @@ fun VerticalReorderList(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .draggedItem(state.offsetOf(item.key))
+                        .draggedItem(state.offsetByKey(item.key))
                         .background(MaterialTheme.colors.surface)
                         .detectReorderAfterLongPress(state)
                 ) {

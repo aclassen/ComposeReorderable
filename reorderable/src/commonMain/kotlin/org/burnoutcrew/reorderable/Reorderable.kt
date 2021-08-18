@@ -58,10 +58,10 @@ class ReorderableState(val listState: LazyListState) {
             ?.let { (selected?.offset?.toFloat() ?: 0f) + movedDist - it.offset }
     }
 
-    fun offsetOf(key: Any) =
+    fun offsetByKey(key: Any) =
         if (draggedKey == key) draggedOffset else null
 
-    fun offsetOf(index: Int) =
+    fun offsetByIndex(index: Int) =
         if (draggedIndex == index) draggedOffset else null
 
     internal var selected by mutableStateOf<LazyListItemInfo?>(null)
