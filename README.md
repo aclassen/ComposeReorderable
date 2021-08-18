@@ -42,7 +42,7 @@ At least apply the dragged item offset:
 ```
 items(items, { it.key }) {item ->
     Column(
-        modifier = Modifier.draggedItem(state.offsetOf(item.key))
+        modifier = Modifier.draggedItem(state.offsetByKey(item.key))
     ) {
         ...
     }
@@ -52,7 +52,7 @@ or without keyed items:
 
 itemsIndexed(items) { idx, item ->
     Column(
-        modifier = Modifier.draggedItem(state.offsetOf(idx))
+        modifier = Modifier.draggedItem(state.offsetByIndex(idx))
     ) {
         ...
     }
@@ -75,7 +75,7 @@ fun ReorderableList(){
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .draggedItem(state.offsetOf(item))
+                    .draggedItem(state.offsetByKey(item))
                     .detectReorderAfterLongPress(state)
             ) {
                 Text(text = item)
