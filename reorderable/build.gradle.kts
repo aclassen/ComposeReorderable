@@ -10,11 +10,11 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.6.1"
+version = "0.6.2"
 
 kotlin {
     android {
-        publishLibraryVariants( "debug")
+        publishLibraryVariants( "debug","release")
     }
     jvm("desktop")
     sourceSets {
