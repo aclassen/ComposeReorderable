@@ -88,7 +88,7 @@ fun ReorderableList(){
 
 ## Notes
 
-When dragging, the existing item will be modified. Because if this reason it`s important that the item must be part of the LazyList visible
+When dragging, the existing item will be modified. Because of that it's important that the item must be part of the LazyList visible
 items all the time.
 
 This can be problematic if no drop target can be found during scrolling.
