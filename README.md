@@ -6,13 +6,11 @@ A Jetpack Compose (Desktop) modifier enabling reordering in a LazyList.
 ![Sample](readme/sample.gif)
 
 ## Download
-
 ```
 dependencies {
-    implementation("org.burnoutcrew.composereorderable:reorderable:<latest_version>")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.6.2")
 }
 ```
-
 ## How to use
 
 Create `reorderState` and add the `reorderable` Modifier to the LazyList:
