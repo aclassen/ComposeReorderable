@@ -17,6 +17,11 @@ dependencies {
 }
 
 android {
+
+    sourceSets {
+        map { it.java.srcDir("src/${it.name}/kotlin") }
+    }
+
     compileSdk = rootProject.extra.get("compileSdk") as Int
     defaultConfig {
         minSdk =  rootProject.extra.get("minVersion") as Int
