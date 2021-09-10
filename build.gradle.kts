@@ -1,7 +1,7 @@
 buildscript {
     val minVersion by extra(21)
-    val targetSdk by extra(30)
-    val compileSdk by extra(30)
+    val targetSdk by extra(31)
+    val compileSdk by extra(31)
     repositories {
         google()
         mavenCentral()
