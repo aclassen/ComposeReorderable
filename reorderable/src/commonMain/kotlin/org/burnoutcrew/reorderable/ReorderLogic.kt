@@ -25,8 +25,8 @@ import kotlin.math.sign
 
 internal class ReorderLogic(
     private val state: ReorderableState,
-    private val onMove: (fromIndex: Int, toIndex: Int) -> (Unit),
-    private val canDragOver: ((index: Int) -> Boolean)? = null,
+    private val onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
+    private val canDragOver: ((index: ItemPosition) -> Boolean)? = null,
     private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
 ) {
     fun startDrag(key: Any) =
@@ -79,29 +79,28 @@ internal class ReorderLogic(
             val end = (start + selected.size)
                 .coerceIn(viewportStartOffset, viewportEndOffset + selected.size)
             state.draggedIndex?.also { draggedItem ->
-                chooseDropIndex(
+                chooseDropItem(
                     state.listState.layoutInfo.visibleItemsInfo
                         .filterNot { it.offsetEnd() < start || it.offset > end || it.index == draggedItem }
-                        .filter { canDragOver?.invoke(it.index) != false },
+                        .filter { canDragOver?.invoke(ItemPosition(it.index, it.key)) != false },
                     start,
                     end
                 )?.also { targetIdx ->
-                    onMove(draggedItem, targetIdx)
-                    state.draggedIndex = targetIdx
+                    onMove(ItemPosition(draggedItem, selected.key), ItemPosition(targetIdx.index, targetIdx.key))
+                    state.draggedIndex = targetIdx.index
                     state.listState.scrollToItem(state.listState.firstVisibleItemIndex, state.listState.firstVisibleItemScrollOffset)
-
                 }
             }
         }
     }
 
-    private fun chooseDropIndex(
+    private fun chooseDropItem(
         items: List<LazyListItemInfo>,
         curStart: Float,
         curEnd: Float,
-    ): Int? =
+    ): LazyListItemInfo? =
         draggedItem.let { draggedItem ->
-            var targetIndex: Int? = null
+            var targetItem: LazyListItemInfo? = null
             if (draggedItem != null) {
                 val distance = curStart - draggedItem.offset
                 if (distance != 0f) {
@@ -118,14 +117,14 @@ internal class ReorderLogic(
                             ?.takeIf { it > targetDiff }
                             ?.also {
                                 targetDiff = it
-                                targetIndex = item.index
+                                targetItem = item
                             }
                     }
                 }
             } else if (state.draggedIndex != null) {
-                targetIndex = items.lastOrNull()?.index
+                targetItem = items.lastOrNull()
             }
-            targetIndex
+            targetItem
         }
 
 

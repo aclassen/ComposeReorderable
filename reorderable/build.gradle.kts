@@ -41,7 +41,7 @@ android {
     }
 
     sourceSets {
-        val main by getting {
+        named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
     }

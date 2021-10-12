@@ -62,7 +62,7 @@ fun HorizontalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
     state: ReorderableState = rememberReorderState(),
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
     LazyRow(
         state = state.listState,
@@ -95,8 +95,8 @@ fun VerticalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
     state: ReorderableState = rememberReorderState(),
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
-    canDragOver: ((index: Int) -> Boolean),
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
+    canDragOver: ((pos: ItemPosition) -> Boolean),
 ) {
     LazyColumn(
         state = state.listState,

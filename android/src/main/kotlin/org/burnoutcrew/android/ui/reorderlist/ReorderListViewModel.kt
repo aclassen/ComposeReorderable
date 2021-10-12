@@ -17,6 +17,7 @@ package org.burnoutcrew.android.ui.reorderlist
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.move
 
 
@@ -26,13 +27,13 @@ class ReorderListViewModel : ViewModel() {
         if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
     }.toMutableStateList()
 
-    fun moveCat(from: Int, to: Int) {
-        cats.move(from, to)
+    fun moveCat(from: ItemPosition, to: ItemPosition) {
+        cats.move(from.index, to.index)
     }
 
-    fun moveDog(from: Int, to: Int) {
-        dogs.move(from, to)
+    fun moveDog(from: ItemPosition, to: ItemPosition) {
+        dogs.move(from.index, to.index)
     }
 
-    fun isDogDragEnabled(idx: Int) = dogs.getOrNull(idx)?.isLocked != true
+    fun isDogDragEnabled(pos: ItemPosition) = dogs.getOrNull(pos.index)?.isLocked != true
 }

@@ -72,8 +72,8 @@ class ReorderableState(val listState: LazyListState) {
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Modifier.reorderable(
     state: ReorderableState,
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
-    canDragOver: ((index: Int) -> Boolean)? = null,
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
+    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     orientation: Orientation = Orientation.Vertical,
     maxScrollPerFrame: Dp = 20.dp,
