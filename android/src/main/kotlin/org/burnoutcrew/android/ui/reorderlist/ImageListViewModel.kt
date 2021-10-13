@@ -19,21 +19,17 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import org.burnoutcrew.reorderable.ItemPosition
 import org.burnoutcrew.reorderable.move
+import kotlin.random.Random
 
 
-class ReorderListViewModel : ViewModel() {
-    val cats = List(500) { ItemData("Cat $it", "") }.toMutableStateList()
-    val dogs = List(500) {
-        if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
-    }.toMutableStateList()
+class ImageListViewModel : ViewModel() {
+    val images = List(20) { "https://picsum.photos/seed/compose$it/200/300" }.toMutableStateList()
+    val headerImage = "https://picsum.photos/seed/compose${Random.nextInt(Int.MAX_VALUE)}/400/200"
+    val footerImage = "https://picsum.photos/seed/compose${Random.nextInt(Int.MAX_VALUE)}/400/200"
 
-    fun moveCat(from: ItemPosition, to: ItemPosition) {
-        cats.move(from.index, to.index)
+    fun onMove(from: ItemPosition, to: ItemPosition) {
+        images.move(images.indexOfFirst { it == from.key }, images.indexOfFirst { it == to.key })
     }
 
-    fun moveDog(from: ItemPosition, to: ItemPosition) {
-        dogs.move(from.index, to.index)
-    }
-
-    fun isDogDragEnabled(pos: ItemPosition) = dogs.getOrNull(pos.index)?.isLocked != true
+    fun canDragOver(pos: ItemPosition) = images.any { it == pos.key }
 }

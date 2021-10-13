@@ -16,7 +16,6 @@
 package org.burnoutcrew.android.ui.reorderlist
 
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
@@ -28,8 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,11 +55,11 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
 }
 
 @Composable
-fun HorizontalReorderList(
+private fun HorizontalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
     state: ReorderableState = rememberReorderState(),
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
     LazyRow(
         state = state.listState,
@@ -91,12 +88,12 @@ fun HorizontalReorderList(
 }
 
 @Composable
-fun VerticalReorderList(
+private fun VerticalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
     state: ReorderableState = rememberReorderState(),
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
-    canDragOver: ((index: Int) -> Boolean),
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
+    canDragOver: ((pos: ItemPosition) -> Boolean),
 ) {
     LazyColumn(
         state = state.listState,

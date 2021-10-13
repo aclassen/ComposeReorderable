@@ -15,7 +15,4 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
-import androidx.compose.runtime.Stable
-
-@Stable
 data class ItemData(val title: String, val key: String, val isLocked: Boolean = false)

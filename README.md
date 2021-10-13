@@ -22,7 +22,7 @@ val state = rememberReorderState()
 
 LazyColumn(
     state = state.listState,
-    modifier = Modifier.reorderable(state, { from, to -> data.move(from, to) })) {
+    modifier = Modifier.reorderable(state, { from, to -> data.move(from.index, to.index) })) {
 ...
 }
 ```
@@ -69,7 +69,7 @@ fun ReorderableList(){
     val data = List(100) { "item $it" }.toMutableStateList()
     LazyColumn(
         state = state.listState,
-        modifier = Modifier.reorderable(state, { a, b -> data.move(a, b) })
+        modifier = Modifier.reorderable(state, { from, to -> data.move(from.index, to.index) })
     ) {
         items(data, { it }) { item ->
             Box(
