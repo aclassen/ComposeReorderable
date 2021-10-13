@@ -41,7 +41,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "Lazy reorder list"
     ) {
-        VerticalReorderList(items = data) { a, b -> data.move(a, b) }
+        VerticalReorderList(items = data) { a, b -> data.move(a.index, b.index) }
     }
 }
 
@@ -49,7 +49,7 @@ fun main() = application {
 fun VerticalReorderList(
     items: List<String>,
     state: ReorderableState = rememberReorderState(),
-    onMove: (fromPos: Int, toPos: Int) -> (Unit),
+    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
     Box {
         LazyColumn(
