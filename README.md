@@ -1,7 +1,7 @@
 [![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 # Compose LazyList reorder
 
-A Jetpack Compose (Desktop) modifier enabling reordering in a LazyList.
+A Jetpack Compose (Android + Desktop) modifier enabling reordering in a LazyList.
 
 ![Sample](readme/sample.gif)
 
