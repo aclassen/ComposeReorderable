@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":reorderable"))
     implementation(compose.runtime)
     implementation(compose.material)
-    implementation("androidx.activity:activity-compose:1.3.1")
+    implementation("androidx.activity:activity-compose:1.4.0")
     implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-rc01")
