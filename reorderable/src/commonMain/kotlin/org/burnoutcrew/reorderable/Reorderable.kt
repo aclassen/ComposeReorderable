@@ -145,7 +145,7 @@ fun Modifier.reorderable(
                 currentEvent.changes.fastFirstOrNull { it.id == dragStart.id }
             }
             val item = down?.position?.let { position ->
-                val off = position.forOrientation(orientation).toInt()
+                val off = state.listState.layoutInfo.viewportStartOffset + position.forOrientation(orientation).toInt()
                 state.listState.layoutInfo.visibleItemsInfo
                     .firstOrNull { off in it.offset..(it.offset + it.size) }
             }
