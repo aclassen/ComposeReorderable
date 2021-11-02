@@ -94,9 +94,8 @@ internal suspend fun PointerInputScope.awaitLongPressOrCancellation(
                         finished = true
                     }
 
-                    if (
-                        event.changes.any { it.consumed.downChange || it.isOutOfBounds(size) }
-                    ) {
+
+                    if (event.changes.any { it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding) }) {
                         finished = true // Canceled
                     }
 
