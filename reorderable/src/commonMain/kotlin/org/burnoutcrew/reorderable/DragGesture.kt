@@ -19,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFirstOrNull
 import kotlinx.coroutines.TimeoutCancellationException
@@ -89,13 +90,13 @@ internal suspend fun PointerInputScope.awaitLongPressOrCancellation(
                 var finished = false
                 while (!finished) {
                     val event = awaitPointerEvent(PointerEventPass.Main)
-                    if (event.changes.all { it.changedToUpIgnoreConsumed() }) {
+                    if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
                         // All pointers are up
                         finished = true
                     }
 
 
-                    if (event.changes.any { it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding) }) {
+                    if (event.changes.fastAny { it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding) }) {
                         finished = true // Canceled
                     }
 
