@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.7.3"
+version = "0.7.4"
 
 kotlin {
     android {
