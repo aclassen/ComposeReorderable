@@ -84,7 +84,7 @@ publishing {
                 }
                 scm {
                     connection.set("https://github.com/aclassen/ComposeReorderable.git")
-                    url.set("https://github.com/aclassen/ComposeReorderableI")
+                    url.set("https://github.com/aclassen/ComposeReorderable")
                 }
                 developers {
                     developer {
