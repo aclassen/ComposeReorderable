@@ -12,7 +12,7 @@ dependencies {
     implementation(compose.material)
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("com.google.android.material:material:1.5.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.4.0-beta02")
     implementation("io.coil-kt:coil-compose:1.4.0")
