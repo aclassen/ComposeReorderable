@@ -1,7 +1,7 @@
 buildscript {
     val minVersion by extra(21)
-    val targetSdk by extra(31)
-    val compileSdk by extra(31)
+    val targetSdk by extra(32)
+    val compileSdk by extra(32)
     repositories {
         google()
         mavenCentral()
@@ -9,9 +9,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:1.0.0")
-        classpath("com.android.tools.build:gradle:7.0.4")
-        classpath(kotlin("gradle-plugin", version = "1.5.31"))
+        classpath("org.jetbrains.compose:compose-gradle-plugin:1.1.1")
+        classpath("com.android.tools.build:gradle:7.2.0")
+        classpath(kotlin("gradle-plugin", version = "1.6.10"))
     }
 }
 

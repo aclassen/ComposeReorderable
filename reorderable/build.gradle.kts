@@ -2,7 +2,6 @@ import org.jetbrains.compose.ComposeBuildConfig.composeVersion
 import org.jetbrains.compose.compose
 
 plugins {
-    id("com.android.library")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("maven-publish")
@@ -10,13 +9,10 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.7.4"
+version = "0.7.5"
 
 kotlin {
-    android {
-        publishLibraryVariants( "debug","release")
-    }
-    jvm("desktop")
+    jvm()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -27,25 +23,6 @@ kotlin {
     }
 }
 
-android {
-    compileSdk = rootProject.extra.get("compileSdk") as Int
-
-    defaultConfig {
-        minSdk =  rootProject.extra.get("minVersion") as Int
-        targetSdk = rootProject.extra.get("targetSdk") as Int
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    sourceSets {
-        named("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-    }
-}
 val javadocJar = tasks.register("javadocJar", Jar::class.java) {
     archiveClassifier.set("javadoc")
 }
