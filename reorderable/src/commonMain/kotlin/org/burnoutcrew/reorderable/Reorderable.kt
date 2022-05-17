@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -68,8 +67,6 @@ class ReorderableState(val listState: LazyListState) {
     internal var movedDist by mutableStateOf(0f)
 }
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
 fun Modifier.reorderable(
     state: ReorderableState,
     onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
