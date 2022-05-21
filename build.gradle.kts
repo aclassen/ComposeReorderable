@@ -9,9 +9,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:1.1.1")
+        classpath("org.jetbrains.compose:compose-gradle-plugin:1.2.0-alpha01-dev686")
         classpath("com.android.tools.build:gradle:7.2.0")
-        classpath(kotlin("gradle-plugin", version = "1.6.10"))
+        classpath(kotlin("gradle-plugin", version = "1.6.21"))
     }
 }
 
@@ -20,5 +20,6 @@ allprojects {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        mavenLocal()
     }
 }

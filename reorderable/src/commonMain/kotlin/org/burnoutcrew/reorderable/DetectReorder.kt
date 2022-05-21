@@ -24,7 +24,7 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChangeConsumed
 
-fun Modifier.detectReorder(state: ReorderableState) =
+fun Modifier.detectReorder(state: ReorderableState<*>) =
     this.then(
         Modifier.pointerInput(Unit) {
             forEachGesture {
@@ -46,7 +46,7 @@ fun Modifier.detectReorder(state: ReorderableState) =
         }
     )
 
-fun Modifier.detectReorderAfterLongPress(state: ReorderableState) =
+fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) =
     this.then(
         Modifier.pointerInput(Unit) {
             forEachGesture {

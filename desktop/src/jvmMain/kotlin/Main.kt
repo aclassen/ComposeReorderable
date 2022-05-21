@@ -17,7 +17,11 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollbarAdapter
@@ -33,7 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import org.burnoutcrew.reorderable.*
+import org.burnoutcrew.reorderable.ItemPosition
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.detectReorder
+import org.burnoutcrew.reorderable.draggedItem
+import org.burnoutcrew.reorderable.move
+import org.burnoutcrew.reorderable.rememberReorderLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
 fun main() = application {
     val data = List(500) { "Cat $it" }.toMutableStateList()
@@ -48,13 +58,14 @@ fun main() = application {
 @Composable
 fun VerticalReorderList(
     items: List<String>,
-    state: ReorderableState = rememberReorderState(),
     onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
+    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove = onMove)
     Box {
         LazyColumn(
             state = state.listState,
-            modifier = Modifier.reorderable(state, onMove)) {
+            modifier = Modifier.reorderable(state)
+        ) {
             items(items, { it }) { item ->
                 Column(
                     modifier = Modifier.draggedItem(state.offsetByKey(item))

@@ -18,7 +18,14 @@ package org.burnoutcrew.android.ui.reorderlist
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
@@ -34,23 +41,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import org.burnoutcrew.android.R
-import org.burnoutcrew.reorderable.*
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.draggedItem
+import org.burnoutcrew.reorderable.rememberReorderLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun ReorderImageList(
     vm: ImageListViewModel = viewModel(),
-    state: ReorderableState = rememberReorderState(),
     modifier: Modifier = Modifier,
 ) {
+    val state: ReorderableLazyListState =
+        rememberReorderLazyListState(onMove = { from, to -> vm.onMove(from, to) }, canDragOver = { vm.canDragOver(it) })
     LazyColumn(
         state = state.listState,
-        modifier = modifier
-            .then(
-                Modifier.reorderable(
-                    state,
-                    onMove = { from, to -> vm.onMove(from, to) },
-                    canDragOver = { vm.canDragOver(it) })
-            )
+        modifier = modifier.then(Modifier.reorderable(state))
     ) {
         item {
             HeaderFooter(stringResource(R.string.header_title), vm.headerImage)

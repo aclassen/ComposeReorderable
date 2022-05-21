@@ -22,7 +22,7 @@ import org.burnoutcrew.reorderable.move
 
 
 class ReorderListViewModel : ViewModel() {
-    val cats = List(500) { ItemData("Cat $it", "") }.toMutableStateList()
+    val cats = List(500) { ItemData("Cat $it", "id$it") }.toMutableStateList()
     val dogs = List(500) {
         if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
     }.toMutableStateList()

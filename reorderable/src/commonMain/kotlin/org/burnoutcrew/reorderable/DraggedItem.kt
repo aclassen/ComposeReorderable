@@ -15,27 +15,16 @@
  */
 package org.burnoutcrew.reorderable
 
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 
-
-fun Modifier.draggedItem(
-    offset: Float?,
-    orientation: Orientation = Orientation.Vertical,
-): Modifier = composed {
-    Modifier
-        .zIndex(offset?.let { 1f } ?: 0f)
+fun Modifier.draggedItem(offset: IntOffset?): Modifier = this.then(
+    zIndex(offset?.let { 1f } ?: 0f)
         .graphicsLayer {
-            with(offset ?: 0f) {
-                if (orientation == Orientation.Vertical) {
-                    translationY = this
-                } else {
-                    translationX = this
-                }
-            }
+            translationX = offset?.x?.toFloat() ?: 0f
+            translationY = offset?.y?.toFloat() ?: 0f
             shadowElevation = offset?.let { 8f } ?: 0f
         }
-}
+)
