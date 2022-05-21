@@ -17,8 +17,12 @@ package org.burnoutcrew.android.ui.reorderlist
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -35,8 +39,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.burnoutcrew.reorderable.*
-
+import org.burnoutcrew.reorderable.ItemPosition
+import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.draggedItem
+import org.burnoutcrew.reorderable.rememberReorderLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun ReorderList(vm: ReorderListViewModel = viewModel()) {
@@ -58,24 +66,21 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
 private fun HorizontalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
-    state: ReorderableState = rememberReorderState(),
     onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
+    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove = onMove)
     LazyRow(
         state = state.listState,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .then(Modifier.reorderable(state, onMove = onMove, orientation = Orientation.Horizontal)),
+            .then(Modifier.reorderable(state)),
     ) {
         itemsIndexed(items) { idx, item ->
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(100.dp)
-                    .draggedItem(
-                        offset = state.offsetByIndex(idx),
-                        orientation = Orientation.Horizontal
-                    )
+                    .draggedItem(state.offsetByIndex(idx))
                     .scale(if (state.draggedIndex == null || state.draggedIndex == idx) 1f else .9f)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colors.primary)
@@ -91,14 +96,14 @@ private fun HorizontalReorderList(
 private fun VerticalReorderList(
     modifier: Modifier = Modifier,
     items: List<ItemData>,
-    state: ReorderableState = rememberReorderState(),
     onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
     canDragOver: ((pos: ItemPosition) -> Boolean),
 ) {
+    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove = onMove, canDragOver = canDragOver)
     LazyColumn(
         state = state.listState,
         modifier = modifier
-            .then(Modifier.reorderable(state, onMove = onMove, canDragOver = canDragOver))
+            .then(Modifier.reorderable(state))
     ) {
         items(items, { it.key }) { item ->
             if (item.isLocked) {

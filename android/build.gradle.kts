@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     id("org.jetbrains.compose")
     id("com.android.application")
@@ -7,9 +5,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":reorderable"))
-    implementation(compose.runtime)
-    implementation(compose.material)
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.8.0")
+    implementation("androidx.compose.runtime:runtime:1.2.0-beta01")
+    implementation("androidx.compose.material:material:1.2.0-beta01")
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("com.google.android.material:material:1.6.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")

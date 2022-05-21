@@ -1,7 +1,7 @@
 [![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
-# Compose LazyList reorder
+# Compose LazyList/Grid reorder
 
-A Jetpack Compose (Android + Desktop) modifier enabling reordering in a LazyList.
+A Jetpack Compose (Android + Desktop) modifier enabling reordering in a LazyList and LazyGrid.
 
 ![Sample](readme/sample.gif)
 
@@ -15,18 +15,20 @@ dependencies {
 
 ## How to use
 
-Create `reorderState` and add the `reorderable` Modifier to the LazyList:
+Create `reorderState` and add the `reorderable` Modifier to the LazyList/Grid:
 
 ```
-val state = rememberReorderState()
+// For a LazyGrid just use `rememberReorderLazyListState`
+val state: ReorderableLazyListState = rememberReorderLazyListState(onMove =  { from, to -> data.move(from.index, to.index) })
 
 LazyColumn(
     state = state.listState,
-    modifier = Modifier.reorderable(state, { from, to -> data.move(from.index, to.index) })) {
+    modifier = Modifier.reorderable(state)) {
 ...
 }
 ```
 
+For a LazyGrid just use `rememberReorderLazyListState`
 To make an item reorderable/draggable add at least one drag modifier to the item:
 
 ```
@@ -65,11 +67,12 @@ Complete example:
 ```
 @Composable
 fun ReorderableList(){
-    val state = rememberReorderState()
     val data = List(100) { "item $it" }.toMutableStateList()
+    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove =  { from, to -> data.move(from.index, to.index) })
+    
     LazyColumn(
         state = state.listState,
-        modifier = Modifier.reorderable(state, { from, to -> data.move(from.index, to.index) })
+        modifier = Modifier.reorderable(state)
     ) {
         items(data, { it }) { item ->
             Box(

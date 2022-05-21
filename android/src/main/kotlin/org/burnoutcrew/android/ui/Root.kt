@@ -16,9 +16,15 @@
 package org.burnoutcrew.android.ui
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.burnoutcrew.android.R
+import org.burnoutcrew.android.ui.reorderlist.ReorderGrid
 import org.burnoutcrew.android.ui.reorderlist.ReorderImageList
 import org.burnoutcrew.android.ui.reorderlist.ReorderList
 import org.burnoutcrew.android.ui.theme.ReorderListTheme
@@ -43,7 +50,8 @@ fun Root() {
         val navController = rememberNavController()
         val navigationItems = listOf(
             NavigationItem.Lists,
-            NavigationItem.Music,
+            NavigationItem.Grids,
+            NavigationItem.Fixed,
         )
         Scaffold(
             topBar = {
@@ -67,7 +75,10 @@ private fun Navigation(navController: NavHostController, modifier: Modifier) {
         composable(NavigationItem.Lists.route) {
             ReorderList()
         }
-        composable(NavigationItem.Music.route) {
+        composable(NavigationItem.Grids.route) {
+            ReorderGrid()
+        }
+        composable(NavigationItem.Fixed.route) {
             ReorderImageList()
         }
     }
@@ -102,5 +113,6 @@ private fun BottomNavigationBar(items: List<NavigationItem>, navController: NavC
 
 private sealed class NavigationItem(var route: String, var icon: ImageVector, var title: String) {
     object Lists : NavigationItem("lists", Icons.Default.List, "Lists")
-    object Music : NavigationItem("fixed", Icons.Default.Star, "Fixed")
+    object Grids : NavigationItem("grids", Icons.Default.Settings, "Grids")
+    object Fixed : NavigationItem("fixed", Icons.Default.Star, "Fixed")
 }

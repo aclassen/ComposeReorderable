@@ -15,72 +15,45 @@
  */
 package org.burnoutcrew.reorderable
 
-
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.lazy.LazyListItemInfo
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
-
-@Composable
-fun rememberReorderState(
-    listState: LazyListState = rememberLazyListState(),
-) = remember { ReorderableState(listState) }
-
-class ReorderableState(val listState: LazyListState) {
-    var draggedIndex by mutableStateOf<Int?>(null)
-        internal set
-
-    internal val ch = Channel<StartDrag>()
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    val draggedKey by derivedStateOf { selected?.key }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    val draggedOffset by derivedStateOf {
-        draggedIndex
-            ?.let { listState.layoutInfo.itemInfoByIndex(it) }
-            ?.let { (selected?.offset?.toFloat() ?: 0f) + movedDist - it.offset }
-    }
-
-    fun offsetByKey(key: Any) =
-        if (draggedKey == key) draggedOffset else null
-
-    fun offsetByIndex(index: Int) =
-        if (draggedIndex == index) draggedOffset else null
-
-    internal var selected by mutableStateOf<LazyListItemInfo?>(null)
-    internal var movedDist by mutableStateOf(0f)
-}
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Modifier.reorderable(
-    state: ReorderableState,
-    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
-    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
-    onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
-    orientation: Orientation = Orientation.Vertical,
+    state: ReorderableState<*>,
     maxScrollPerFrame: Dp = 20.dp,
 ) = composed {
     val job: MutableState<Job?> = remember { mutableStateOf(null) }
     val maxScroll = with(LocalDensity.current) { maxScrollPerFrame.toPx() }
-    val logic = remember { ReorderLogic(state, onMove, canDragOver, onDragEnd) }
     val scope = rememberCoroutineScope()
     val interactions = remember { MutableSharedFlow<ReorderAction>(extraBufferCapacity = 16) }
     fun cancelAutoScroll() {
@@ -92,25 +65,21 @@ fun Modifier.reorderable(
     LaunchedEffect(state) {
         merge(
             interactions,
-            snapshotFlow { state.listState.layoutInfo }
-                .distinctUntilChanged { old, new ->
-                    old.visibleItemsInfo.firstOrNull()?.key == new.visibleItemsInfo.firstOrNull()?.key
-                            && old.visibleItemsInfo.lastOrNull()?.key == new.visibleItemsInfo.lastOrNull()?.key
-                }
-                .map { ReorderAction.Drag(0f) }
+            snapshotFlow { state.visibleItemsInfo }
+                .map { ReorderAction.Drag(0f, 0f) }
         )
             .collect { event ->
                 when (event) {
                     is ReorderAction.End -> {
                         cancelAutoScroll()
-                        logic.endDrag()
+                        state.endDrag()
                     }
                     is ReorderAction.Start -> {
-                        logic.startDrag(event.key)
+                        state.startDrag(event.key)
                     }
                     is ReorderAction.Drag -> {
-                        if (logic.dragBy(event.amount) && job.value?.isActive != true) {
-                            val scrollOffset = logic.calcAutoScrollOffset(0, maxScroll)
+                        if (state.dragBy(event.amount.toInt(), event.amountY?.toInt() ?: 0) && job.value?.isActive != true) {
+                            val scrollOffset = state.calcAutoScrollOffset(0, maxScroll)
                             if (scrollOffset != 0f) {
                                 job.value =
                                     scope.launch {
@@ -121,10 +90,10 @@ fun Modifier.reorderable(
                                                 if (start == 0L) {
                                                     start = it
                                                 } else {
-                                                    scroll = logic.calcAutoScrollOffset(it - start, maxScroll)
+                                                    scroll = state.calcAutoScrollOffset(it - start, maxScroll)
                                                 }
                                             }
-                                            if (logic.scrollBy(scroll) != scroll) {
+                                            if (state.scrollBy(scroll) != scroll) {
                                                 scroll = 0f
                                             }
                                         }
@@ -144,15 +113,15 @@ fun Modifier.reorderable(
             val down = awaitPointerEventScope {
                 currentEvent.changes.fastFirstOrNull { it.id == dragStart.id }
             }
+
             val item = down?.position?.let { position ->
-                val off = state.listState.layoutInfo.viewportStartOffset + position.forOrientation(orientation).toInt()
-                state.listState.layoutInfo.visibleItemsInfo
-                    .firstOrNull { off in it.offset..(it.offset + it.size) }
+                state.findKeyAt(position.x, position.y)
             }
             if (down != null && item != null) {
-                interactions.tryEmit(ReorderAction.Start(item.key))
+
+                interactions.tryEmit(ReorderAction.Start(item))
                 dragStart.offet?.also {
-                    interactions.tryEmit(ReorderAction.Drag(it.forOrientation(orientation)))
+                    interactions.tryEmit(ReorderAction.Drag(it.x, it.y))
                 }
                 detectDrag(
                     down.id,
@@ -160,14 +129,14 @@ fun Modifier.reorderable(
                     onDragCancel = { interactions.tryEmit(ReorderAction.End) },
                     onDrag = { change, dragAmount ->
                         change.consumeAllChanges()
-                        interactions.tryEmit(ReorderAction.Drag(dragAmount.forOrientation(orientation)))
+                        interactions.tryEmit(ReorderAction.Drag(dragAmount.x, dragAmount.y))
                     })
             }
         }
     }
 }
 
-private suspend fun PointerInputScope.detectDrag(
+internal suspend fun PointerInputScope.detectDrag(
     down: PointerId,
     onDragEnd: () -> Unit = { },
     onDragCancel: () -> Unit = { },
@@ -193,11 +162,9 @@ private suspend fun PointerInputScope.detectDrag(
     }
 }
 
-private fun Offset.forOrientation(orientation: Orientation) = if (orientation == Orientation.Vertical) y else x
-
-private sealed class ReorderAction {
+internal sealed class ReorderAction {
     class Start(val key: Any) : ReorderAction()
-    class Drag(val amount: Float) : ReorderAction()
+    class Drag(val amount: Float, val amountY: Float? = null) : ReorderAction()
     object End : ReorderAction()
 }
 
