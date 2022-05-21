@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.8.0")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.8.1")
     implementation("androidx.compose.runtime:runtime:1.2.0-beta01")
     implementation("androidx.compose.material:material:1.2.0-beta01")
     implementation("androidx.activity:activity-compose:1.4.0")
