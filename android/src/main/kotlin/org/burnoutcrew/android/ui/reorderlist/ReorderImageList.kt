@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 André Claßen
+ * Copyright 2022 André Claßen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
-
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,56 +31,66 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import org.burnoutcrew.android.R
-import org.burnoutcrew.reorderable.ReorderableLazyListState
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.draggedItem
-import org.burnoutcrew.reorderable.rememberReorderLazyListState
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorder
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun ReorderImageList(
-    vm: ImageListViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    vm: ImageListViewModel = viewModel(),
 ) {
-    val state: ReorderableLazyListState =
-        rememberReorderLazyListState(onMove = { from, to -> vm.onMove(from, to) }, canDragOver = { vm.canDragOver(it) })
+    val state = rememberReorderableLazyListState(onMove = vm::onMove, canDragOver = vm::canDragOver)
     LazyColumn(
         state = state.listState,
-        modifier = modifier.then(Modifier.reorderable(state))
+        modifier = modifier
+            .then(Modifier.reorderable(state))
     ) {
         item {
             HeaderFooter(stringResource(R.string.header_title), vm.headerImage)
         }
         items(vm.images, { it }) { item ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .draggedItem(state.offsetByKey(item))
-                    .background(MaterialTheme.colors.surface)
-                    .detectReorderAfterLongPress(state)
-            ) {
-                Row {
-                    Image(
-                        painter = rememberImagePainter(item),
-                        contentDescription = null,
-                        modifier = Modifier.size(128.dp)
-                    )
-                    Text(
-                        text = item,
-                        modifier = Modifier.padding(16.dp)
-                    )
+            ReorderableItem(state, item) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                Column(
+                    modifier = Modifier
+                        .shadow(elevation.value)
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.surface)
+
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            Icons.Default.List, "",
+                            modifier = Modifier.detectReorder(state)
+                        )
+                        Image(
+                            painter = rememberAsyncImagePainter(item),
+                            contentDescription = null,
+                            modifier = Modifier.size(128.dp)
+                        )
+                        Text(
+                            text = item,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Divider()
                 }
-                Divider()
             }
         }
         item {

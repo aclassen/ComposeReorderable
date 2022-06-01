@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":reorderable"))
+                implementation("org.burnoutcrew.composereorderable:reorderable:0.9.0")
                 implementation(compose.desktop.currentOs)
             }
         }

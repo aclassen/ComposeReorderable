@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 André Claßen
+ * Copyright 2022 André Claßen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
-
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,55 +34,52 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.burnoutcrew.reorderable.ItemPosition
+import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.draggedItem
 import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
 import org.burnoutcrew.reorderable.reorderable
-
 
 @Composable
 fun ReorderGrid(vm: ReorderListViewModel = viewModel()) {
     Column {
         HorizontalGrid(
-            items = vm.cats,
-            modifier = Modifier.padding(vertical = 16.dp),
-            onMove = { from, to -> vm.moveCat(from, to) },
+            vm = vm,
+            modifier = Modifier.padding(vertical = 16.dp)
         )
-        VerticalGrid(
-            items = vm.dogs,
-            onMove = { from, to -> vm.moveDog(from, to) },
-            canDragOver = { vm.isDogDragEnabled(it) },
-        )
+        VerticalGrid(vm = vm)
     }
 }
 
-
 @Composable
 private fun HorizontalGrid(
+    vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
-    items: List<ItemData>,
-    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
 ) {
-    val state = rememberReorderableLazyGridState(onMove = onMove)
+    val state = rememberReorderableLazyGridState(onMove = vm::moveCat)
     LazyHorizontalGrid(
         rows = GridCells.Fixed(2),
         state = state.gridState,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.reorderable(state).height(200.dp)
     ) {
-        items(items, { it.key }) { item ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .padding(4.dp)
-                    .draggedItem(offset = state.offsetByKey(item.key))
-                    .background(MaterialTheme.colors.secondary)
-                    .detectReorderAfterLongPress(state)
-            ) {
-                Text(item.title)
+        items(vm.cats, { it.key }) { item ->
+            ReorderableItem(state, item.key) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .shadow(elevation.value)
+                        .aspectRatio(1f)
+                        .background(MaterialTheme.colors.secondary)
+                        .detectReorderAfterLongPress(state)
+                ) {
+                    Text(item.title)
+                }
             }
         }
     }
@@ -88,28 +87,42 @@ private fun HorizontalGrid(
 
 @Composable
 private fun VerticalGrid(
+    vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
-    items: List<ItemData>,
-    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
-    canDragOver: ((pos: ItemPosition) -> Boolean),
 ) {
-    val state = rememberReorderableLazyGridState(onMove = onMove, canDragOver = canDragOver)
+    val state = rememberReorderableLazyGridState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
         state = state.gridState,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.reorderable(state)
     ) {
-        items(items, { it.key }) { item ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(4.dp)
-                    .draggedItem(state.offsetByKey(item.key))
-                    .background(MaterialTheme.colors.primary)
-                    .detectReorderAfterLongPress(state)
-            ) {
-                Text(item.title)
+        items(vm.dogs, { it.key }) { item ->
+            ReorderableItem(state, item.key) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                if (item.isLocked) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(MaterialTheme.colors.surface)
+                    ) {
+                        Text(item.title)
+                    }
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .shadow(elevation.value)
+                            .aspectRatio(1f)
+                            .background(MaterialTheme.colors.primary)
+                            .detectReorderAfterLongPress(state)
+                    ) {
+                        Text(item.title)
+                    }
+                }
             }
         }
     }

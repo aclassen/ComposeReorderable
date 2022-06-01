@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 André Claßen
+ * Copyright 2022 André Claßen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
-
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -36,100 +36,98 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.burnoutcrew.reorderable.ItemPosition
-import org.burnoutcrew.reorderable.ReorderableLazyListState
+import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.draggedItem
-import org.burnoutcrew.reorderable.rememberReorderLazyListState
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     Column {
-        HorizontalReorderList(
-            items = vm.cats,
+        NewHorizontalReorderList(
+            vm = vm,
             modifier = Modifier.padding(vertical = 16.dp),
-            onMove = { from, to -> vm.moveCat(from, to) },
         )
-        VerticalReorderList(
-            items = vm.dogs,
-            onMove = { from, to -> vm.moveDog(from, to) },
-            canDragOver = { vm.isDogDragEnabled(it) },
-        )
+        NewVerticalReorderList(vm = vm)
     }
 }
 
+
 @Composable
-private fun HorizontalReorderList(
+private fun NewVerticalReorderList(
     modifier: Modifier = Modifier,
-    items: List<ItemData>,
-    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
+    vm: ReorderListViewModel,
 ) {
-    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove = onMove)
-    LazyRow(
+    val state = rememberReorderableLazyListState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
+    LazyColumn(
         state = state.listState,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .then(Modifier.reorderable(state)),
+            .then(Modifier.reorderable(state))
     ) {
-        itemsIndexed(items) { idx, item ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(100.dp)
-                    .draggedItem(state.offsetByIndex(idx))
-                    .scale(if (state.draggedIndex == null || state.draggedIndex == idx) 1f else .9f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colors.primary)
-                    .detectReorderAfterLongPress(state)
-            ) {
-                Text(item.title)
+        items(vm.dogs, { item -> item.key }) { item ->
+            ReorderableItem(state, item.key) { dragging ->
+                val elevation = animateDpAsState(if (dragging) 8.dp else 0.dp)
+                if (item.isLocked) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.LightGray)
+                    ) {
+                        Text(
+                            text = item.title,
+                            modifier = Modifier.padding(24.dp)
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .shadow(elevation.value)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colors.surface)
+                            .detectReorderAfterLongPress(state)
+                    ) {
+                        Text(
+                            text = item.title,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Divider()
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun VerticalReorderList(
+private fun NewHorizontalReorderList(
+    vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
-    items: List<ItemData>,
-    onMove: (fromPos: ItemPosition, toPos: ItemPosition) -> (Unit),
-    canDragOver: ((pos: ItemPosition) -> Boolean),
 ) {
-    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove = onMove, canDragOver = canDragOver)
-    LazyColumn(
+    val state = rememberReorderableLazyListState(onMove = vm::moveCat)
+    LazyRow(
         state = state.listState,
-        modifier = modifier
-            .then(Modifier.reorderable(state))
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.then(Modifier.reorderable(state)),
     ) {
-        items(items, { it.key }) { item ->
-            if (item.isLocked) {
-                Column(
+        items(vm.cats, { item -> item.key }) { item ->
+            ReorderableItem(state, item.key) { dragging ->
+                val scale = animateFloatAsState(if (dragging) 1.1f else 1.0f)
+                val elevation = if (dragging) 8.dp else 0.dp
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.LightGray)
-                ) {
-                    Text(
-                        text = item.title,
-                        modifier = Modifier.padding(24.dp)
-                    )
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .draggedItem(state.offsetByKey(item.key))
-                        .background(MaterialTheme.colors.surface)
+                        .size(100.dp)
+                        .scale(scale.value)
+                        .shadow(elevation, RoundedCornerShape(24.dp))
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.Red)
                         .detectReorderAfterLongPress(state)
                 ) {
-                    Text(
-                        text = item.title,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Divider()
+                    Text(item.title)
                 }
             }
         }
