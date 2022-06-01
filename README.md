@@ -15,86 +15,37 @@ dependencies {
 
 ## How to use
 
-Create `reorderState` and add the `reorderable` Modifier to the LazyList/Grid:
-
-```
-// For a LazyGrid just use `rememberReorderLazyListState`
-val state: ReorderableLazyListState = rememberReorderLazyListState(onMove =  { from, to -> data.move(from.index, to.index) })
-
-LazyColumn(
-    state = state.listState,
-    modifier = Modifier.reorderable(state)) {
-...
-}
-```
-
-For a LazyGrid just use `rememberReorderLazyListState`
-To make an item reorderable/draggable add at least one drag modifier to the item:
-
-```
- Modifier.detectReorder(state)
- or
- Modifier.detectReorderAfterLongPress(state)
-```
-
-> Adding one of the detect modifiers to the LazyList instead of an item , will make all items reordable.
-
-At least apply the dragged item offset:
-
-```
-items(items, { it.key }) {item ->
-    Column(
-        modifier = Modifier.draggedItem(state.offsetByKey(item.key))
-    ) {
-        ...
-    }
-}
-
-or without keyed items:
-
-itemsIndexed(items) { idx, item ->
-    Column(
-        modifier = Modifier.draggedItem(state.offsetByIndex(idx))
-    ) {
-        ...
-    }
-}
-```
-
-> You can use `draggedItem` for a default dragged effect or create your own.
-
-Complete example:
 ```
 @Composable
-fun ReorderableList(){
-    val data = List(100) { "item $it" }.toMutableStateList()
-    val state: ReorderableLazyListState = rememberReorderLazyListState(onMove =  { from, to -> data.move(from.index, to.index) })
-    
+fun VerticalReorderList() {
+    val data = remember { mutableStateOf(List(100) { "Item $it" }) }
+    val state = rememberReorderableLazyListState(onMove = { from, to ->
+        data.value = data.value.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    })
     LazyColumn(
         state = state.listState,
         modifier = Modifier.reorderable(state)
     ) {
-        items(data, { it }) { item ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .draggedItem(state.offsetByKey(item))
-                    .detectReorderAfterLongPress(state)
-            ) {
-                Text(text = item)
+        items(data.value, { it }) { item ->
+            ReorderableItem(state, key = item) { isDragging ->
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.surface)
+                        .detectReorderAfterLongPress(state)
+                ) {
+                    Text(item)
+                }
             }
         }
     }
 }
 ```
 
-
 ## Notes
 
-When dragging, the existing item will be modified. Because of that it's important that the item must be part of the LazyList visible
-items all the time.
-
-This can be problematic if no drop target can be found during scrolling.
+It's a known issue that the first visible item does not animate. 
 
 ## License
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 André Claßen
+ * Copyright 2022 André Claßen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,28 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import org.burnoutcrew.reorderable.ItemPosition
-import org.burnoutcrew.reorderable.move
-
 
 class ReorderListViewModel : ViewModel() {
-    val cats = List(500) { ItemData("Cat $it", "id$it") }.toMutableStateList()
-    val dogs = List(500) {
+    var cats by mutableStateOf(List(500) { ItemData("Cat $it", "id$it") })
+    var dogs by mutableStateOf(List(500) {
         if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
-    }.toMutableStateList()
+    })
 
     fun moveCat(from: ItemPosition, to: ItemPosition) {
-        cats.move(from.index, to.index)
+        cats = cats.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
     }
 
     fun moveDog(from: ItemPosition, to: ItemPosition) {
-        dogs.move(from.index, to.index)
+        dogs = dogs.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
     }
 
     fun isDogDragEnabled(pos: ItemPosition) = dogs.getOrNull(pos.index)?.isLocked != true

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 André Claßen
+ * Copyright 2022 André Claßen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChangeConsumed
 
 fun Modifier.detectReorder(state: ReorderableState<*>) =
     this.then(
@@ -34,17 +32,18 @@ fun Modifier.detectReorder(state: ReorderableState<*>) =
                     var overSlop = Offset.Zero
                     do {
                         drag = awaitPointerSlopOrCancellation(down.id, down.type) { change, over ->
-                            change.consumePositionChange()
+                            change.consume()
                             overSlop = over
                         }
-                    } while (drag != null && !drag.positionChangeConsumed())
+                    } while (drag != null && !drag.isConsumed)
                     if (drag != null) {
-                        state.ch.trySend(StartDrag(down.id, overSlop))
+                        state.interactions.trySend(StartDrag(down.id, overSlop))
                     }
                 }
             }
         }
     )
+
 
 fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) =
     this.then(
@@ -54,7 +53,7 @@ fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) =
                     awaitFirstDown(requireUnconsumed = false)
                 }
                 awaitLongPressOrCancellation(down)?.also {
-                    state.ch.trySend(StartDrag(down.id))
+                    state.interactions.trySend(StartDrag(down.id))
                 }
             }
         }
