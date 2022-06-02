@@ -15,6 +15,13 @@ dependencies {
 
 ## How to use
 
+- Create a reorderable state by  `rememberReorderableLazyListState` for LazyList or `rememberReorderableLazyGridState` for LazyGrid
+- Add the `reorderable(state)` modifier to your list/grid
+- Inside the list/grid itemscope create a `ReorderableItem(state, key = )` for a keyed lists or `ReorderableItem(state, index = )` for a indexed only list. (Animated items only work with keyed lists)
+- Apply the `detectReorderAfterLongPress(state)` or `detectReorder(state)` modifier to the root or any child composable inside the item layout
+
+`ReorderableItem` provides the item dragging state, use this to apply elevation , scale etc.
+
 ```
 @Composable
 fun VerticalReorderList() {
@@ -41,7 +48,42 @@ fun VerticalReorderList() {
         }
     }
 }
+
 ```
+The item placement and drag cancelled animation can be changed or disbaled by `dragCancelledAnimation` and `defaultDraggingModifier`
+
+```
+@Composable
+fun VerticalReorderGrid() {
+    val data = remember { mutableStateOf(List(100) { "Item $it" }) }
+    val state = rememberReorderableLazyGridState(dragCancelledAnimation = NoDragCancelledAnimation(),
+        onMove = { from, to ->
+            data.value = data.value.toMutableList().apply {
+                add(to.index, removeAt(from.index))
+            }
+        })
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(4),
+        state = state.gridState,
+        modifier = Modifier.reorderable(state)
+    ) {
+        items(data.value, { it }) { item ->
+            ReorderableItem(state, key = item, defaultDraggingModifier = Modifier) { isDragging ->
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .background(MaterialTheme.colors.surface)
+                        .detectReorderAfterLongPress(state)
+                ) {
+                    Text(item)
+                }
+            }
+        }
+    }
+}
+```
+
+Check out the sample app for different implementation samples.
 
 ## Notes
 
