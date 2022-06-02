@@ -66,7 +66,9 @@ private fun NewVerticalReorderList(
     LazyColumn(
         state = state.listState,
         modifier = modifier
-            .then(Modifier.reorderable(state))
+            .then(Modifier
+                .reorderable(state)
+                .detectReorderAfterLongPress(state))
     ) {
         items(vm.dogs, { item -> item.key }) { item ->
             ReorderableItem(state, item.key) { dragging ->
@@ -88,7 +90,6 @@ private fun NewVerticalReorderList(
                             .shadow(elevation.value)
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
-                            .detectReorderAfterLongPress(state)
                     ) {
                         Text(
                             text = item.title,
@@ -111,7 +112,9 @@ private fun NewHorizontalReorderList(
     LazyRow(
         state = state.listState,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.then(Modifier.reorderable(state)),
+        modifier = modifier.then(Modifier
+            .reorderable(state))
+            .detectReorderAfterLongPress(state),
     ) {
         items(vm.cats, { item -> item.key }) { item ->
             ReorderableItem(state, item.key) { dragging ->
@@ -125,7 +128,6 @@ private fun NewHorizontalReorderList(
                         .shadow(elevation, RoundedCornerShape(24.dp))
                         .clip(RoundedCornerShape(24.dp))
                         .background(Color.Red)
-                        .detectReorderAfterLongPress(state)
                 ) {
                     Text(item.title)
                 }

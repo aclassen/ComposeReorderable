@@ -65,7 +65,9 @@ private fun HorizontalGrid(
         contentPadding = PaddingValues(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.reorderable(state).height(200.dp)
+        modifier = modifier
+            .reorderable(state).height(200.dp)
+            .detectReorderAfterLongPress(state)
     ) {
         items(vm.cats, { it.key }) { item ->
             ReorderableItem(state, item.key) { isDragging ->
@@ -76,7 +78,6 @@ private fun HorizontalGrid(
                         .shadow(elevation.value)
                         .aspectRatio(1f)
                         .background(MaterialTheme.colors.secondary)
-                        .detectReorderAfterLongPress(state)
                 ) {
                     Text(item.title)
                 }
@@ -97,7 +98,9 @@ private fun VerticalGrid(
         contentPadding = PaddingValues(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.reorderable(state)
+        modifier = modifier
+            .reorderable(state)
+            .detectReorderAfterLongPress(state)
     ) {
         items(vm.dogs, { it.key }) { item ->
             ReorderableItem(state, item.key) { isDragging ->
@@ -118,7 +121,6 @@ private fun VerticalGrid(
                             .shadow(elevation.value)
                             .aspectRatio(1f)
                             .background(MaterialTheme.colors.primary)
-                            .detectReorderAfterLongPress(state)
                     ) {
                         Text(item.title)
                     }
