@@ -1,7 +1,7 @@
 [![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 # Compose LazyList/Grid reorder
 
-A Jetpack Compose (Android + Desktop) modifier enabling reordering by dran and drop in a LazyList and LazyGrid.
+A Jetpack Compose (Android + Desktop) modifier enabling reordering by drag and drop in a LazyList and LazyGrid.
 
 ![Sample](readme/sample.gif)
 
