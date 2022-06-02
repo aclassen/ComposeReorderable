@@ -18,7 +18,8 @@ dependencies {
 - Create a reorderable state by  `rememberReorderableLazyListState` for LazyList or `rememberReorderableLazyGridState` for LazyGrid
 - Add the `reorderable(state)` modifier to your list/grid
 - Inside the list/grid itemscope create a `ReorderableItem(state, key = )` for a keyed lists or `ReorderableItem(state, index = )` for a indexed only list. (Animated items only work with keyed lists)
-- Apply the `detectReorderAfterLongPress(state)` or `detectReorder(state)` modifier to the root or any child composable inside the item layout
+- Apply the `detectReorderAfterLongPress(state)` or `detectReorder(state)` modifier to the list.
+If only a drag handle is needed apply the detect modifier to any child composable inside the item layout.
 
 `ReorderableItem` provides the item dragging state, use this to apply elevation , scale etc.
 
@@ -33,7 +34,9 @@ fun VerticalReorderList() {
     })
     LazyColumn(
         state = state.listState,
-        modifier = Modifier.reorderable(state)
+        modifier = Modifier
+        .reorderable(state)
+        .detectReorderAfterLongPress(state)
     ) {
         items(data.value, { it }) { item ->
             ReorderableItem(state, key = item) { isDragging ->
@@ -42,7 +45,6 @@ fun VerticalReorderList() {
                     modifier = Modifier
                         .shadow(elevation.value)
                         .background(MaterialTheme.colors.surface)
-                        .detectReorderAfterLongPress(state)
                 ) {
                     Text(item)
                 }
@@ -75,9 +77,10 @@ fun VerticalReorderGrid() {
                     modifier = Modifier
                         .aspectRatio(1f)
                         .background(MaterialTheme.colors.surface)
-                        .detectReorderAfterLongPress(state)
                 ) {
-                    Text(item)
+                    Text(text = item,
+                         modifier = Modifier.detectReorderAfterLongPress(state)
+                    )
                 }
             }
         }
