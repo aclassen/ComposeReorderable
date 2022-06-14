@@ -16,6 +16,7 @@
 package org.burnoutcrew.reorderable
 
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,7 +26,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 
@@ -50,13 +53,24 @@ fun rememberReorderableLazyListState(
             .collect { state.onDrag(0, 0) }
     }
 
+    Scroller(state, listState, run {
+        var reverseDirection = !listState.layoutInfo.reverseLayout
+        if (LocalLayoutDirection.current == LayoutDirection.Rtl && listState.layoutInfo.orientation != Orientation.Vertical) {
+            reverseDirection = !reverseDirection
+        }
+        if (reverseDirection) -1f else 1f
+    })
+    return state
+}
+
+@Composable
+private fun Scroller(state: ReorderableState<*>, listState: ScrollableState, direction: Float) {
     LaunchedEffect(state) {
         while (true) {
             val diff = state.scrollChannel.receive()
-            listState.scrollBy(diff)
+            listState.scrollBy(diff * direction)
         }
     }
-    return state
 }
 
 class ReorderableLazyListState(
@@ -71,13 +85,29 @@ class ReorderableLazyListState(
     override val isVerticalScroll: Boolean
         get() = listState.layoutInfo.orientation == Orientation.Vertical
     override val LazyListItemInfo.left: Int
-        get() = if (isVerticalScroll) 0 else offset
+        get() = when {
+            isVerticalScroll -> 0
+            listState.layoutInfo.reverseLayout -> listState.layoutInfo.viewportSize.width - offset - size
+            else -> offset
+        }
     override val LazyListItemInfo.top: Int
-        get() = if (isVerticalScroll) offset else 0
+        get() = when {
+            !isVerticalScroll -> 0
+            listState.layoutInfo.reverseLayout -> listState.layoutInfo.viewportSize.height - offset - size
+            else -> offset
+        }
     override val LazyListItemInfo.right: Int
-        get() = if (isVerticalScroll) 0 else offset + size
+        get() = when {
+            isVerticalScroll -> 0
+            listState.layoutInfo.reverseLayout -> listState.layoutInfo.viewportSize.width - offset
+            else -> offset + size
+        }
     override val LazyListItemInfo.bottom: Int
-        get() = if (isVerticalScroll) offset + size else 0
+        get() = when {
+            !isVerticalScroll -> 0
+            listState.layoutInfo.reverseLayout -> listState.layoutInfo.viewportSize.height - offset
+            else -> offset + size
+        }
     override val LazyListItemInfo.width: Int
         get() = if (isVerticalScroll) 0 else size
     override val LazyListItemInfo.height: Int
