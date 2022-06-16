@@ -47,30 +47,24 @@ fun rememberReorderableLazyListState(
     val state = remember(listState) {
         ReorderableLazyListState(listState, scope, maxScroll, onMove, canDragOver, onDragEnd, dragCancelledAnimation)
     }
-
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     LaunchedEffect(state) {
         state.visibleItemsChanged()
             .collect { state.onDrag(0, 0) }
     }
 
-    Scroller(state, listState, run {
+    LaunchedEffect(state) {
         var reverseDirection = !listState.layoutInfo.reverseLayout
-        if (LocalLayoutDirection.current == LayoutDirection.Rtl && listState.layoutInfo.orientation != Orientation.Vertical) {
+        if (isRtl && listState.layoutInfo.orientation != Orientation.Vertical) {
             reverseDirection = !reverseDirection
         }
-        if (reverseDirection) -1f else 1f
-    })
-    return state
-}
-
-@Composable
-private fun Scroller(state: ReorderableState<*>, listState: ScrollableState, direction: Float) {
-    LaunchedEffect(state) {
+        val direction = if (reverseDirection) 1f else -1f
         while (true) {
             val diff = state.scrollChannel.receive()
             listState.scrollBy(diff * direction)
         }
     }
+    return state
 }
 
 class ReorderableLazyListState(
@@ -81,7 +75,14 @@ class ReorderableLazyListState(
     canDragOver: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
-) : ReorderableState<LazyListItemInfo>(scope, maxScrollPerFrame, onMove, canDragOver, onDragEnd, dragCancelledAnimation) {
+) : ReorderableState<LazyListItemInfo>(
+    scope,
+    maxScrollPerFrame,
+    onMove,
+    canDragOver,
+    onDragEnd,
+    dragCancelledAnimation
+) {
     override val isVerticalScroll: Boolean
         get() = listState.layoutInfo.orientation == Orientation.Vertical
     override val LazyListItemInfo.left: Int
@@ -145,7 +146,12 @@ class ReorderableLazyListState(
             super.findTargets(x, 0, selected)
         }
 
-    override fun chooseDropItem(draggedItemInfo: LazyListItemInfo?, items: List<LazyListItemInfo>, curX: Int, curY: Int) =
+    override fun chooseDropItem(
+        draggedItemInfo: LazyListItemInfo?,
+        items: List<LazyListItemInfo>,
+        curX: Int,
+        curY: Int
+    ) =
         if (isVerticalScroll) {
             super.chooseDropItem(draggedItemInfo, items, 0, curY)
         } else {
