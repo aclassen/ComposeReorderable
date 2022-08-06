@@ -9,9 +9,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:1.2.0-alpha01-dev741")
-        classpath("com.android.tools.build:gradle:7.2.1")
-        classpath(kotlin("gradle-plugin", version = "1.6.21"))
+        classpath("org.jetbrains.compose:compose-gradle-plugin:1.2.0-alpha01-dev753")
+        classpath("com.android.tools.build:gradle:7.2.2")
+        classpath(kotlin("gradle-plugin", version = "1.7.0"))
     }
 }
 
