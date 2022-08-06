@@ -103,7 +103,7 @@ fun ReorderImageList(
 private fun HeaderFooter(title: String, url: String) {
     Box(modifier = Modifier.height(128.dp).fillMaxWidth()) {
         Image(
-            painter = rememberImagePainter(url),
+            painter = rememberAsyncImagePainter(url),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
