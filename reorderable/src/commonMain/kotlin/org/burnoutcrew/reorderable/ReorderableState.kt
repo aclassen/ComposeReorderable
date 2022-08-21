@@ -64,13 +64,13 @@ abstract class ReorderableState<T>(
     internal val interactions = Channel<StartDrag>()
     internal val scrollChannel = Channel<Float>()
     val draggingItemLeft: Float
-        get() = draggingLayoutInfo?.let { item ->
+        get() = if(draggingItemKey!=null) draggingLayoutInfo?.let { item ->
             (selected?.left ?: 0) + draggingDelta.x - item.left
-        } ?: 0f
+        } ?: 0f else 0f
     val draggingItemTop: Float
-        get() = draggingLayoutInfo?.let { item ->
+        get() = if(draggingItemKey!=null) draggingLayoutInfo?.let { item ->
             (selected?.top ?: 0) + draggingDelta.y - item.top
-        } ?: 0f
+        } ?: 0f else 0f
     abstract val isVerticalScroll: Boolean
     private val draggingLayoutInfo: T?
         get() = visibleItemsInfo
