@@ -1,5 +1,5 @@
-[![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 # Compose LazyList/Grid reorder
+[![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 
 A Jetpack Compose (Android + Desktop) modifier enabling reordering by drag and drop in a LazyList and LazyGrid.
 
@@ -23,7 +23,7 @@ If only a drag handle is needed apply the detect modifier to any child composabl
 
 `ReorderableItem` provides the item dragging state, use this to apply elevation , scale etc.
 
-```
+```kotlin
 @Composable
 fun VerticalReorderList() {
     val data = remember { mutableStateOf(List(100) { "Item $it" }) }
@@ -56,7 +56,7 @@ fun VerticalReorderList() {
 ```
 The item placement and drag cancelled animation can be changed or disabled by `dragCancelledAnimation` and `defaultDraggingModifier`
 
-```
+```kotlin
 @Composable
 fun VerticalReorderGrid() {
     val data = remember { mutableStateOf(List(100) { "Item $it" }) }
@@ -97,7 +97,7 @@ It's a known issue that the first visible item does not animate.
 ## License
 
 ```
-Copyright 2021 André Claßen
+Copyright 2022 André Claßen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
