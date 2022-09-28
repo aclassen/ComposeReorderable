@@ -33,6 +33,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,8 +76,14 @@ fun ReorderImageList(
 
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            Icons.Default.List, "",
+//                        Image(
+//                            Icons.Default.List,
+//                            "",
+//                            modifier = Modifier.detectReorder(state)
+//                        )
+                        Text(
+                            "=", // Show a drag handle
+                            color = MaterialTheme.colors.onBackground,
                             modifier = Modifier.detectReorder(state)
                         )
                         Image(
