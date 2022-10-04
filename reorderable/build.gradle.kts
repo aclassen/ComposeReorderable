@@ -1,5 +1,4 @@
 import org.jetbrains.compose.ComposeBuildConfig.composeVersion
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
@@ -9,7 +8,7 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.9.2"
+version = "0.9.3"
 
 kotlin {
     jvm()

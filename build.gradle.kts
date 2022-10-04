@@ -1,18 +1,15 @@
-buildscript {
-    val minVersion by extra(21)
-    val targetSdk by extra(32)
-    val compileSdk by extra(32)
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
+plugins {
+    `maven-publish`
+    id("com.android.library") version "7.3.0" apply false
+    id("org.jetbrains.kotlin.multiplatform") version "1.7.10" apply false
+    id("org.jetbrains.kotlin.android") version "1.7.10" apply false
+    id("org.jetbrains.compose") version "1.2.0-beta02" apply false
+}
 
-    dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:1.2.0-beta02")
-        classpath("com.android.tools.build:gradle:7.2.2")
-        classpath(kotlin("gradle-plugin", version = "1.7.0"))
-    }
+ext {
+    extra["compileSdkVersion"] = 33
+    extra["minSdkVersion"] = 21
+    extra["targetSdkVersion"] = 33
 }
 
 allprojects {

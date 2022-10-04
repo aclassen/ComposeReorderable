@@ -21,18 +21,20 @@ android {
     sourceSets {
         map { it.java.srcDir("src/${it.name}/kotlin") }
     }
-
-    compileSdk = rootProject.extra.get("compileSdk") as Int
+    val minSdkVersion: Int by rootProject.extra
+    val targetSdkVersion: Int by rootProject.extra
+    val compileSdkVersion: Int by rootProject.extra
+    compileSdk = compileSdkVersion
     defaultConfig {
-        minSdk =  rootProject.extra.get("minVersion") as Int
-        targetSdk = rootProject.extra.get("targetSdk") as Int
+        minSdk =  minSdkVersion
+        targetSdk = targetSdkVersion
         versionCode = 1
         versionName = "1.0"
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
