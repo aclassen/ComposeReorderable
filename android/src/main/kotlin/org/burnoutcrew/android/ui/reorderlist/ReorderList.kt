@@ -66,9 +66,11 @@ private fun NewVerticalReorderList(
     LazyColumn(
         state = state.listState,
         modifier = modifier
-            .then(Modifier
-                .reorderable(state)
-                .detectReorderAfterLongPress(state))
+            .then(
+                Modifier
+                    .reorderable(state)
+                    .detectReorderAfterLongPress(state)
+            )
     ) {
         items(vm.dogs, { item -> item.key }) { item ->
             ReorderableItem(state, item.key) { dragging ->
@@ -112,8 +114,8 @@ private fun NewHorizontalReorderList(
     LazyRow(
         state = state.listState,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.then(Modifier
-            .reorderable(state))
+        modifier = modifier
+            .then(Modifier.reorderable(state))
             .detectReorderAfterLongPress(state),
     ) {
         items(vm.cats, { item -> item.key }) { item ->

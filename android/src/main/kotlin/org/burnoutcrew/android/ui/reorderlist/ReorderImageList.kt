@@ -38,12 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import org.burnoutcrew.android.R
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorder
@@ -76,7 +76,9 @@ fun ReorderImageList(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            Icons.Default.List, "",
+                            Icons.Default.List,
+                            "",
+                            colorFilter = ColorFilter.tint(color = MaterialTheme.colors.onBackground),
                             modifier = Modifier.detectReorder(state)
                         )
                         Image(
