@@ -38,6 +38,7 @@ fun rememberReorderableLazyListState(
     onMove: (ItemPosition, ItemPosition) -> Unit,
     listState: LazyListState = rememberLazyListState(),
     canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragStart: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     maxScrollPerFrame: Dp = 20.dp,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
@@ -45,7 +46,7 @@ fun rememberReorderableLazyListState(
     val maxScroll = with(LocalDensity.current) { maxScrollPerFrame.toPx() }
     val scope = rememberCoroutineScope()
     val state = remember(listState) {
-        ReorderableLazyListState(listState, scope, maxScroll, onMove, canDragOver, onDragEnd, dragCancelledAnimation)
+        ReorderableLazyListState(listState, scope, maxScroll, onMove, canDragOver, canDragStart, onDragEnd, dragCancelledAnimation)
     }
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     LaunchedEffect(state) {
@@ -73,6 +74,7 @@ class ReorderableLazyListState(
     maxScrollPerFrame: Float,
     onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
     canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragStart: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
 ) : ReorderableState<LazyListItemInfo>(
@@ -80,6 +82,7 @@ class ReorderableLazyListState(
     maxScrollPerFrame,
     onMove,
     canDragOver,
+    canDragStart,
     onDragEnd,
     dragCancelledAnimation
 ) {

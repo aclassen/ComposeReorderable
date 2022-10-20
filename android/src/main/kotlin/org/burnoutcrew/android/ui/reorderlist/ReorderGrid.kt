@@ -91,7 +91,7 @@ private fun VerticalGrid(
     vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val state = rememberReorderableLazyGridState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
+    val state = rememberReorderableLazyGridState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled, canStartDrag = vm::canDrag)
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
         state = state.gridState,

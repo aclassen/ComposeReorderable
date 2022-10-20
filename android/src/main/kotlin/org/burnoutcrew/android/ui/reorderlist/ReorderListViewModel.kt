@@ -40,4 +40,12 @@ class ReorderListViewModel : ViewModel() {
     }
 
     fun isDogDragEnabled(pos: ItemPosition) = dogs.getOrNull(pos.index)?.isLocked != true
+
+    fun canDrag(pos: ItemPosition): Boolean {
+        return if (dogs.get(pos.index).isLocked) {
+            false
+        } else {
+            true
+        }
+    }
 }

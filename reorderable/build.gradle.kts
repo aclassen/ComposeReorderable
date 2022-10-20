@@ -1,4 +1,6 @@
 import org.jetbrains.compose.ComposeBuildConfig.composeVersion
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     kotlin("multiplatform")
@@ -7,8 +9,8 @@ plugins {
     id("signing")
 }
 
-group = "org.burnoutcrew.composereorderable"
-version = "0.9.3"
+group = "sg.com.sph.android"
+version = "1.0.0-SNAPSHOT"
 
 kotlin {
     jvm()
@@ -30,42 +32,18 @@ publishing {
     publications {
         repositories {
             maven {
-                name="oss"
-                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/SPHTech/ComposeReorderable")
                 credentials {
-                    username = extra.properties.getOrDefault("ossrh.Username", "") as String
-                    password = extra.properties.getOrDefault("ossrh.Password", "") as String
-                }
-            }
-        }
-    }
-    publications {
-        withType<MavenPublication> {
-            artifact(javadocJar)
-            pom {
-                name.set("ComposeReorderable")
-                description.set("Reorderable Compose LazyList")
-                licenses {
-                    license {
-                        name.set("Apache-2.0")
-                        url.set("https://opensource.org/licenses/Apache-2.0")
-                    }
-                }
-                url.set("https://github.com/aclassen/ComposeReorderable")
-                issueManagement {
-                    system.set("Github")
-                    url.set("https://github.com/aclassen/ComposeReorderable/issues")
-                }
-                scm {
-                    connection.set("https://github.com/aclassen/ComposeReorderable.git")
-                    url.set("https://github.com/aclassen/ComposeReorderable")
-                }
-                developers {
-                    developer {
-                        name.set("Andre Claßen")
-                        email.set("andreclassen1337@gmail.com")
+                    val file = rootProject.file("local.properties")
+                    if (file.exists()) {
+                        val localProperties = Properties()
+                        localProperties.load(FileInputStream(file))
+                        username = localProperties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                        password = localProperties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+                    } else {
+                        username = System.getenv("GITHUB_USERNAME")
+                        password = System.getenv("GITHUB_TOKEN")
                     }
                 }
             }
@@ -73,6 +51,3 @@ publishing {
     }
 }
 
-signing {
-    sign(publishing.publications)
-}

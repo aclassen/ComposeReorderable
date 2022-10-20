@@ -34,6 +34,7 @@ fun rememberReorderableLazyGridState(
     onMove: (ItemPosition, ItemPosition) -> Unit,
     gridState: LazyGridState = rememberLazyGridState(),
     canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canStartDrag: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     maxScrollPerFrame: Dp = 20.dp,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
@@ -41,7 +42,7 @@ fun rememberReorderableLazyGridState(
     val maxScroll = with(LocalDensity.current) { maxScrollPerFrame.toPx() }
     val scope = rememberCoroutineScope()
     val state = remember(gridState) {
-        ReorderableLazyGridState(gridState, scope, maxScroll, onMove, canDragOver, onDragEnd, dragCancelledAnimation)
+        ReorderableLazyGridState(gridState, scope, maxScroll, onMove, canDragOver, canStartDrag, onDragEnd, dragCancelledAnimation)
     }
     LaunchedEffect(state) {
         state.visibleItemsChanged()
@@ -63,9 +64,10 @@ class ReorderableLazyGridState(
     maxScrollPerFrame: Float,
     onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
     canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canStartDrag: ((index: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
-) : ReorderableState<LazyGridItemInfo>(scope, maxScrollPerFrame, onMove, canDragOver, onDragEnd, dragCancelledAnimation) {
+) : ReorderableState<LazyGridItemInfo>(scope, maxScrollPerFrame, onMove, canDragOver, canStartDrag, onDragEnd, dragCancelledAnimation) {
     override val isVerticalScroll: Boolean
         get() = gridState.layoutInfo.orientation == Orientation.Vertical
     override val LazyGridItemInfo.left: Int

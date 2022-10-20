@@ -41,6 +41,7 @@ abstract class ReorderableState<T>(
     private val maxScrollPerFrame: Float,
     private val onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
     private val canDragOver: ((index: ItemPosition) -> Boolean)?,
+    private val canStartDrag: ((index: ItemPosition) -> Boolean)?,
     private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))?,
     val dragCancelledAnimation: DragCancelledAnimation
 ) {
@@ -91,12 +92,20 @@ abstract class ReorderableState<T>(
             .distinctUntilChanged { old, new -> old.firstOrNull()?.itemIndex == new.firstOrNull()?.itemIndex && old.count() == new.count() }
 
     internal open fun onDragStart(offsetX: Int, offsetY: Int): Boolean {
-        return visibleItemsInfo
-            .firstOrNull { offsetX in it.left..it.right && offsetY in it.top..it.bottom }
-            ?.also {
+        val dragItem = visibleItemsInfo
+            .firstOrNull {
+                offsetX in it.left..it.right && offsetY in it.top..it.bottom
+            } ?: return false
+
+        dragItem.let {
+            if (canStartDrag?.invoke(ItemPosition(it.itemIndex, it.itemKey)) != false) {
                 selected = it
                 draggingItemIndex = it.itemIndex
-            } != null
+                return true
+            } else {
+                return false
+            }
+        }
     }
 
     internal fun onDragCanceled() {

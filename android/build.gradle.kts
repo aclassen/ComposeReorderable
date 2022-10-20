@@ -26,7 +26,7 @@ android {
     val compileSdkVersion: Int by rootProject.extra
     compileSdk = compileSdkVersion
     defaultConfig {
-        minSdk =  minSdkVersion
+        minSdk = minSdkVersion
         targetSdk = targetSdkVersion
         versionCode = 1
         versionName = "1.0"
