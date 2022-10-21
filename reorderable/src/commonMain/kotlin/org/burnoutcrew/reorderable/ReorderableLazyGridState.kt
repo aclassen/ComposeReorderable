@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 fun rememberReorderableLazyGridState(
     onMove: (ItemPosition, ItemPosition) -> Unit,
     gridState: LazyGridState = rememberLazyGridState(),
-    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     maxScrollPerFrame: Dp = 20.dp,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
@@ -62,7 +62,7 @@ class ReorderableLazyGridState(
     scope: CoroutineScope,
     maxScrollPerFrame: Float,
     onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
-    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
 ) : ReorderableState<LazyGridItemInfo>(scope, maxScrollPerFrame, onMove, canDragOver, onDragEnd, dragCancelledAnimation) {

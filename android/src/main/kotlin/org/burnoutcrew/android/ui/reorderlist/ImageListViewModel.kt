@@ -33,5 +33,5 @@ class ImageListViewModel : ViewModel() {
         }
     }
 
-    fun canDragOver(pos: ItemPosition) = images.any { it == pos.key }
+    fun canDragOver(draggedOver: ItemPosition, dragging: ItemPosition) = images.any { it == draggedOver.key }
 }

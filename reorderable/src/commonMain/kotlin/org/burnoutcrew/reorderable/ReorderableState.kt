@@ -40,7 +40,7 @@ abstract class ReorderableState<T>(
     private val scope: CoroutineScope,
     private val maxScrollPerFrame: Float,
     private val onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
-    private val canDragOver: ((index: ItemPosition) -> Boolean)?,
+    private val canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)?,
     private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))?,
     val dragCancelledAnimation: DragCancelledAnimation
 ) {
@@ -203,7 +203,7 @@ abstract class ReorderableState<T>(
             ) {
                 return@fastForEach
             }
-            if (canDragOver?.invoke(ItemPosition(item.itemIndex, item.itemKey)) != false) {
+            if (canDragOver?.invoke(ItemPosition(item.itemIndex, item.itemKey), ItemPosition(selected.itemIndex, selected.itemKey)) != false) {
                 val dx = (centerX - (item.left + item.right) / 2).absoluteValue
                 val dy = (centerY - (item.top + item.bottom) / 2).absoluteValue
                 val dist = dx * dx + dy * dy

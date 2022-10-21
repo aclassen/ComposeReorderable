@@ -37,7 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 fun rememberReorderableLazyListState(
     onMove: (ItemPosition, ItemPosition) -> Unit,
     listState: LazyListState = rememberLazyListState(),
-    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     maxScrollPerFrame: Dp = 20.dp,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
@@ -72,7 +72,7 @@ class ReorderableLazyListState(
     scope: CoroutineScope,
     maxScrollPerFrame: Float,
     onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
-    canDragOver: ((index: ItemPosition) -> Boolean)? = null,
+    canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)? = null,
     onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))? = null,
     dragCancelledAnimation: DragCancelledAnimation = SpringDragCancelledAnimation()
 ) : ReorderableState<LazyListItemInfo>(

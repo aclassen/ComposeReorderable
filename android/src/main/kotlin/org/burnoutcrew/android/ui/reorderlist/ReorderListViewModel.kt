@@ -39,5 +39,5 @@ class ReorderListViewModel : ViewModel() {
         }
     }
 
-    fun isDogDragEnabled(pos: ItemPosition) = dogs.getOrNull(pos.index)?.isLocked != true
+    fun isDogDragEnabled(draggedOver: ItemPosition, dragging: ItemPosition) = dogs.getOrNull(draggedOver.index)?.isLocked != true
 }
