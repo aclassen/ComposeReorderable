@@ -8,15 +8,15 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.9.4"
+version = "0.9.5"
 
 kotlin {
     jvm()
     sourceSets {
         val commonMain by getting {
             dependencies {
-                compileOnly(compose.foundation)
-                compileOnly("org.jetbrains.compose.ui:ui-util:${composeVersion}")
+                implementation(compose.foundation)
+                implementation("org.jetbrains.compose.ui:ui-util:${composeVersion}")
             }
         }
     }
