@@ -91,8 +91,10 @@ abstract class ReorderableState<T>(
             .distinctUntilChanged { old, new -> old.firstOrNull()?.itemIndex == new.firstOrNull()?.itemIndex && old.count() == new.count() }
 
     internal open fun onDragStart(offsetX: Int, offsetY: Int): Boolean {
+        val x = if (!isVerticalScroll) offsetX + viewportStartOffset else offsetX
+        val y = if (isVerticalScroll) offsetY + viewportStartOffset else offsetY
         return visibleItemsInfo
-            .firstOrNull { offsetX in it.left..it.right && offsetY in it.top..it.bottom }
+            .firstOrNull { x in it.left..it.right && y in it.top..it.bottom }
             ?.also {
                 selected = it
                 draggingItemIndex = it.itemIndex
