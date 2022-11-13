@@ -91,8 +91,15 @@ abstract class ReorderableState<T>(
             .distinctUntilChanged { old, new -> old.firstOrNull()?.itemIndex == new.firstOrNull()?.itemIndex && old.count() == new.count() }
 
     internal open fun onDragStart(offsetX: Int, offsetY: Int): Boolean {
-        val x = if (!isVerticalScroll) offsetX + viewportStartOffset else offsetX
-        val y = if (isVerticalScroll) offsetY + viewportStartOffset else offsetY
+        val x: Int
+        val y: Int
+        if (isVerticalScroll) {
+            x = offsetX
+            y = offsetY + viewportStartOffset
+        } else {
+            x = offsetX + viewportStartOffset
+            y = offsetY
+        }
         return visibleItemsInfo
             .firstOrNull { x in it.left..it.right && y in it.top..it.bottom }
             ?.also {
@@ -205,7 +212,11 @@ abstract class ReorderableState<T>(
             ) {
                 return@fastForEach
             }
-            if (canDragOver?.invoke(ItemPosition(item.itemIndex, item.itemKey), ItemPosition(selected.itemIndex, selected.itemKey)) != false) {
+            if (canDragOver?.invoke(
+                    ItemPosition(item.itemIndex, item.itemKey),
+                    ItemPosition(selected.itemIndex, selected.itemKey)
+                ) != false
+            ) {
                 val dx = (centerX - (item.left + item.right) / 2).absoluteValue
                 val dy = (centerY - (item.top + item.bottom) / 2).absoluteValue
                 val dist = dx * dx + dy * dy
