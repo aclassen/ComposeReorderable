@@ -48,29 +48,23 @@ import org.burnoutcrew.reorderable.reorderable
 @Composable
 fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     Column {
-        NewHorizontalReorderList(
+        HorizontalReorderList(
             vm = vm,
             modifier = Modifier.padding(vertical = 16.dp),
         )
-        NewVerticalReorderList(vm = vm)
+        VerticalReorderList(vm = vm)
     }
 }
 
-
 @Composable
-private fun NewVerticalReorderList(
+private fun VerticalReorderList(
     modifier: Modifier = Modifier,
     vm: ReorderListViewModel,
 ) {
     val state = rememberReorderableLazyListState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
     LazyColumn(
         state = state.listState,
-        modifier = modifier
-            .then(
-                Modifier
-                    .reorderable(state)
-                    .detectReorderAfterLongPress(state)
-            )
+        modifier = modifier.reorderable(state)
     ) {
         items(vm.dogs, { item -> item.key }) { item ->
             ReorderableItem(state, item.key) { dragging ->
@@ -89,6 +83,7 @@ private fun NewVerticalReorderList(
                 } else {
                     Column(
                         modifier = Modifier
+                            .detectReorderAfterLongPress(state)
                             .shadow(elevation.value)
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
@@ -106,7 +101,7 @@ private fun NewVerticalReorderList(
 }
 
 @Composable
-private fun NewHorizontalReorderList(
+private fun HorizontalReorderList(
     vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
 ) {

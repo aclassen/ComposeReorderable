@@ -66,7 +66,8 @@ private fun HorizontalGrid(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
-            .reorderable(state).height(200.dp)
+            .reorderable(state)
+            .height(200.dp)
             .detectReorderAfterLongPress(state)
     ) {
         items(vm.cats, { it.key }) { item ->
@@ -98,26 +99,25 @@ private fun VerticalGrid(
         contentPadding = PaddingValues(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
-            .reorderable(state)
-            .detectReorderAfterLongPress(state)
+        modifier = modifier.reorderable(state)
     ) {
         items(vm.dogs, { it.key }) { item ->
-            ReorderableItem(state, item.key) { isDragging ->
-                val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
-                if (item.isLocked) {
+            if (item.isLocked) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(MaterialTheme.colors.surface)
+                ) {
+                    Text(item.title)
+                }
+            } else {
+                ReorderableItem(state, item.key) { isDragging ->
+                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .size(100.dp)
-                            .background(MaterialTheme.colors.surface)
-                    ) {
-                        Text(item.title)
-                    }
-                } else {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
+                            .detectReorderAfterLongPress(state)
                             .shadow(elevation.value)
                             .aspectRatio(1f)
                             .background(MaterialTheme.colors.primary)
