@@ -12,6 +12,9 @@ version = "0.9.6"
 
 kotlin {
     jvm()
+    macosArm64()
+    macosX64()
+    ios()
     sourceSets {
         val commonMain by getting {
             dependencies {
