@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     implementation(project(":reorderable"))
-    implementation("androidx.compose.runtime:runtime:1.3.1")
+    implementation("androidx.compose.runtime:runtime:1.3.2")
     implementation("androidx.compose.material:material:1.3.1")
     implementation("androidx.activity:activity-compose:1.6.1")
     implementation("com.google.android.material:material:1.7.0")
