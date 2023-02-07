@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.burnoutcrew.composereorderable"
-version = "0.9.6"
+version = "0.9.7"
 
 kotlin {
     jvm()
@@ -16,6 +16,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.foundation)
+                implementation(compose.animation)
                 implementation("org.jetbrains.compose.ui:ui-util:${composeVersion}")
             }
         }
