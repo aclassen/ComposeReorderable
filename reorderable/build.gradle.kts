@@ -16,6 +16,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.foundation)
+                implementation(compose.animation)
                 implementation("org.jetbrains.compose.ui:ui-util:${composeVersion}")
             }
         }
