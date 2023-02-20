@@ -12,6 +12,10 @@ version = "0.9.7"
 
 kotlin {
     jvm()
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
