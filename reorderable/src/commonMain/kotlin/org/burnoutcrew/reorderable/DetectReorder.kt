@@ -35,8 +35,8 @@ fun Modifier.detectReorder(state: ReorderableState<*>) = detect(state){
     awaitDragOrCancellation(it)
 }
 
-fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) = detect(state) { pointerId ->
-    awaitLongPressOrCancellation(pointerId)
+fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) = detect(state) {
+    awaitLongPressOrCancellation(it)
 }
 
 
