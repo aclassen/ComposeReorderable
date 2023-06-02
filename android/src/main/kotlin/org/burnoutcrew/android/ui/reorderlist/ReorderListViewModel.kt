@@ -22,8 +22,8 @@ import androidx.lifecycle.ViewModel
 import org.burnoutcrew.reorderable.ItemPosition
 
 class ReorderListViewModel : ViewModel() {
-    var cats by mutableStateOf(List(500) { ItemData("Cat $it", "id$it") })
-    var dogs by mutableStateOf(List(500) {
+    var cats by mutableStateOf(List(6) { ItemData("Cat $it", "id$it") })
+    var dogs by mutableStateOf(List(6) {
         if (it.mod(10) == 0) ItemData("Locked", "id$it", true) else ItemData("Dog $it", "id$it")
     })
 

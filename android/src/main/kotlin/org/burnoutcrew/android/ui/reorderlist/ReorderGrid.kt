@@ -16,12 +16,15 @@
 package org.burnoutcrew.android.ui.reorderlist
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +32,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -38,8 +44,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorder
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyGridState
+import org.burnoutcrew.reorderable.rememberReorderableLazyVerticalStaggeredGridState
 import org.burnoutcrew.reorderable.reorderable
 
 @Composable
@@ -49,9 +57,59 @@ fun ReorderGrid(vm: ReorderListViewModel = viewModel()) {
             vm = vm,
             modifier = Modifier.padding(vertical = 16.dp)
         )
-        VerticalGrid(vm = vm)
+        VerticalGrid(vm = vm, modifier = Modifier.padding(vertical = 16.dp))
+        VerticalStaggeredGrid(vm = vm, modifier = Modifier.padding(vertical = 16.dp))
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun VerticalStaggeredGrid(
+    vm: ReorderListViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val state = rememberReorderableLazyVerticalStaggeredGridState(
+        onMove = vm::moveDog,
+        canDragOver = vm::isDogDragEnabled
+    )
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(4),
+        state = state.gridState,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier.reorderable(state),
+    ) {
+        items(items = vm.dogs, key = { it.key }) { item ->
+            if (item.isLocked) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(MaterialTheme.colors.surface)
+                ) {
+                    Text(item.title)
+                }
+            } else {
+                ReorderableItem(state, item.key) { isDragging ->
+                    val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .detectReorder(state)
+                            .shadow(elevation.value)
+                            .aspectRatio(1f)
+                            .background(MaterialTheme.colors.primary)
+                    ) {
+                        Text(item.title)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun HorizontalGrid(
@@ -92,7 +150,8 @@ private fun VerticalGrid(
     vm: ReorderListViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val state = rememberReorderableLazyGridState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
+    val state =
+        rememberReorderableLazyGridState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
         state = state.gridState,
