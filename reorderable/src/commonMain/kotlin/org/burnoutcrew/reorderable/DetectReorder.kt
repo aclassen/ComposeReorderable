@@ -45,12 +45,12 @@ fun Modifier.detectReorder(state: ReorderableState<*>) =
     )
 
 
-fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>) =
+fun Modifier.detectReorderAfterLongPress(state: ReorderableState<*>, requireUnconsumed: Boolean = false) =
     this.then(
         Modifier.pointerInput(Unit) {
             forEachGesture {
                 val down = awaitPointerEventScope {
-                    awaitFirstDown(requireUnconsumed = false)
+                    awaitFirstDown(requireUnconsumed = requireUnconsumed)
                 }
                 awaitLongPressOrCancellation(down)?.also {
                     state.interactions.trySend(StartDrag(down.id))

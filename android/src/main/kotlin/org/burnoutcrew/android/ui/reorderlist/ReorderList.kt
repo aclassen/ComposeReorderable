@@ -15,9 +15,13 @@
  */
 package org.burnoutcrew.android.ui.reorderlist
 
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +35,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.burnoutcrew.reorderable.ReorderableItem
@@ -56,19 +63,25 @@ fun ReorderList(vm: ReorderListViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VerticalReorderList(
     modifier: Modifier = Modifier,
     vm: ReorderListViewModel,
 ) {
     val state = rememberReorderableLazyListState(onMove = vm::moveDog, canDragOver = vm::isDogDragEnabled)
+    val context = LocalContext.current
     LazyColumn(
         state = state.listState,
         modifier = modifier.reorderable(state)
     ) {
+
         items(vm.dogs, { item -> item.key }) { item ->
             ReorderableItem(state, item.key) { dragging ->
                 val elevation = animateDpAsState(if (dragging) 8.dp else 0.dp)
+                val interactionSource = remember {
+                    MutableInteractionSource()
+                }
                 if (item.isLocked) {
                     Column(
                         modifier = Modifier
@@ -91,6 +104,14 @@ private fun VerticalReorderList(
                         Text(
                             text = item.title,
                             modifier = Modifier.padding(16.dp)
+                                .combinedClickable(
+                                    interactionSource = interactionSource,
+                                    indication = rememberRipple(false),
+                                    onLongClick = {
+                                        Toast.makeText(context, "Thi will stop the detect of parent view", Toast.LENGTH_SHORT).show()
+                                    },
+                                    onClick = {}
+                                )
                         )
                         Divider()
                     }
