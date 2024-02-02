@@ -44,6 +44,8 @@ abstract class ReorderableState<T>(
     private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))?,
     val dragCancelledAnimation: DragCancelledAnimation
 ) {
+    var layoutWindowPosition = mutableStateOf(Offset.Zero)
+
     var draggingItemIndex by mutableStateOf<Int?>(null)
         private set
     val draggingItemKey: Any?
@@ -61,7 +63,6 @@ abstract class ReorderableState<T>(
     protected abstract val firstVisibleItemScrollOffset: Int
     protected abstract val viewportStartOffset: Int
     protected abstract val viewportEndOffset: Int
-    internal val interactions = Channel<StartDrag>()
     internal val scrollChannel = Channel<Float>()
     val draggingItemLeft: Float
         get() = if(draggingItemKey!=null) draggingLayoutInfo?.let { item ->
