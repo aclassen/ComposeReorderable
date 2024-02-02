@@ -76,7 +76,6 @@ private fun VerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(4),
         state = state.gridState,
         contentPadding = PaddingValues(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.reorderable(state),
     ) {
