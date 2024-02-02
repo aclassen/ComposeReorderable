@@ -1,3 +1,5 @@
+**Note:** *gitflow will be used for this project. Make sure your PRs are against the develop branch.*
+
 # Compose LazyList/Grid reorder
 [![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 
