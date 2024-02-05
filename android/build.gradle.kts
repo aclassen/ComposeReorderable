@@ -6,14 +6,15 @@ plugins {
 
 dependencies {
     implementation(project(":reorderable"))
-    implementation("androidx.compose.runtime:runtime:1.3.3")
-    implementation("androidx.compose.material:material:1.3.1")
-    implementation("androidx.activity:activity-compose:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("androidx.compose.runtime:runtime:1.6.0")
+    implementation("androidx.compose.material:material:1.6.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 }
 
 android {
@@ -21,13 +22,14 @@ android {
     sourceSets {
         map { it.java.srcDir("src/${it.name}/kotlin") }
     }
+
     val minSdkVersion: Int by rootProject.extra
     val targetSdkVersion: Int by rootProject.extra
     val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
     defaultConfig {
         minSdk =  minSdkVersion
         targetSdk = targetSdkVersion
+        compileSdk = compileSdkVersion
         versionCode = 1
         versionName = "1.0"
     }
@@ -38,7 +40,8 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     namespace = "org.burnoutcrew.android"
+    buildToolsVersion = "34.0.0"
 }

@@ -41,9 +41,12 @@ abstract class ReorderableState<T>(
     private val maxScrollPerFrame: Float,
     private val onMove: (fromIndex: ItemPosition, toIndex: ItemPosition) -> (Unit),
     private val canDragOver: ((draggedOver: ItemPosition, dragging: ItemPosition) -> Boolean)?,
+    private val onDragStart: ((startIndex: Int, x: Int, y: Int) -> (Unit))? = null,
     private val onDragEnd: ((startIndex: Int, endIndex: Int) -> (Unit))?,
     val dragCancelledAnimation: DragCancelledAnimation
 ) {
+    var layoutWindowPosition = mutableStateOf(Offset.Zero)
+
     var draggingItemIndex by mutableStateOf<Int?>(null)
         private set
     val draggingItemKey: Any?
@@ -61,16 +64,15 @@ abstract class ReorderableState<T>(
     protected abstract val firstVisibleItemScrollOffset: Int
     protected abstract val viewportStartOffset: Int
     protected abstract val viewportEndOffset: Int
-    internal val interactions = Channel<StartDrag>()
     internal val scrollChannel = Channel<Float>()
     val draggingItemLeft: Float
-        get() = draggingLayoutInfo?.let { item ->
+        get() = if(draggingItemKey!=null) draggingLayoutInfo?.let { item ->
             (selected?.left ?: 0) + draggingDelta.x - item.left
-        } ?: 0f
+        } ?: 0f else 0f
     val draggingItemTop: Float
-        get() = draggingLayoutInfo?.let { item ->
+        get() = if(draggingItemKey!=null) draggingLayoutInfo?.let { item ->
             (selected?.top ?: 0) + draggingDelta.y - item.top
-        } ?: 0f
+        } ?: 0f else 0f
     abstract val isVerticalScroll: Boolean
     private val draggingLayoutInfo: T?
         get() = visibleItemsInfo
@@ -105,6 +107,7 @@ abstract class ReorderableState<T>(
             ?.also {
                 selected = it
                 draggingItemIndex = it.itemIndex
+                onDragStart?.invoke(it.itemIndex, offsetX, offsetY)
             } != null
     }
 
