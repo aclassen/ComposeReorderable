@@ -1,7 +1,7 @@
 # Compose LazyList/Grid reorder
 [![Latest release](https://img.shields.io/github/v/release/aclassen/ComposeReorderable?color=brightgreen&label=latest%20release)](https://github.com/aclassen/ComposeReorderable/releases/latest)
 
-A Jetpack Compose (Android + Desktop) modifier enabling reordering by drag and drop in a LazyList and LazyGrid.
+A Kotlin Multiplatform Jetpack Compose modifier enabling reordering by drag and drop in a LazyList and LazyGrid. Targets Android, Desktop (JVM), and Web.
 
 ![Sample](readme/sample.gif)
 
@@ -15,13 +15,13 @@ dependencies {
 
 ## How to use
 
-- Create a reorderable state by  `rememberReorderableLazyListState` for LazyList or `rememberReorderableLazyGridState` for LazyGrid
+- Create a reorderable state by `rememberReorderableLazyListState` for LazyList or `rememberReorderableLazyGridState` for LazyGrid
 - Add the `reorderable(state)` modifier to your list/grid
-- Inside the list/grid itemscope create a `ReorderableItem(state, key = )` for a keyed lists or `ReorderableItem(state, index = )` for a indexed only list. (Animated items only work with keyed lists)
+- Inside the list/grid item scope create a `ReorderableItem(state, key = )` for keyed lists or `ReorderableItem(state, index = )` for an index-only list. (Animated items only work with keyed lists)
 - Apply the `detectReorderAfterLongPress(state)` or `detectReorder(state)` modifier to the list.
 If only a drag handle is needed apply the detect modifier to any child composable inside the item layout.
 
-`ReorderableItem` provides the item dragging state, use this to apply elevation , scale etc.
+`ReorderableItem` provides the item dragging state, use this to apply elevation, scale etc.
 
 ```kotlin
 @Composable
@@ -44,7 +44,7 @@ fun VerticalReorderList() {
                 Column(
                     modifier = Modifier
                         .shadow(elevation.value)
-                        .background(MaterialTheme.colors.surface)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     Text(item)
                 }
@@ -72,11 +72,11 @@ fun VerticalReorderGrid() {
         modifier = Modifier.reorderable(state)
     ) {
         items(data.value, { it }) { item ->
-            ReorderableItem(state, key = item, defaultDraggingModifier = Modifier) { isDragging ->
+            ReorderableItem(state, key = item) { isDragging ->
                 Box(
                     modifier = Modifier
                         .aspectRatio(1f)
-                        .background(MaterialTheme.colors.surface)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     Text(text = item,
                          modifier = Modifier.detectReorderAfterLongPress(state)
