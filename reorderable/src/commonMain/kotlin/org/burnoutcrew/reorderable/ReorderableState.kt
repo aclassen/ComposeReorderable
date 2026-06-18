@@ -318,7 +318,7 @@ abstract class ReorderableState<T>(
 
     companion object {
         private const val ACCELERATION_LIMIT_TIME_MS: Long = 1500
-        private val EaseOutQuadInterpolator: (Float) -> (Float) = {
+        private val EaseOutQuartInterpolator: (Float) -> (Float) = {
             val t = 1 - it
             1 - t * t * t * t
         }
@@ -334,7 +334,7 @@ abstract class ReorderableState<T>(
         ): Float {
             if (viewSizeOutOfBounds == 0f) return 0f
             val outOfBoundsRatio = min(1f, 1f * viewSizeOutOfBounds.absoluteValue / viewSize)
-            val cappedScroll = sign(viewSizeOutOfBounds) * maxScroll * EaseOutQuadInterpolator(outOfBoundsRatio)
+            val cappedScroll = sign(viewSizeOutOfBounds) * maxScroll * EaseOutQuartInterpolator(outOfBoundsRatio)
             val timeRatio = if (time > ACCELERATION_LIMIT_TIME_MS) 1f else time.toFloat() / ACCELERATION_LIMIT_TIME_MS
             return (cappedScroll * EaseInQuintInterpolator(timeRatio)).let {
                 if (it == 0f) {
