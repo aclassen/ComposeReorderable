@@ -39,7 +39,7 @@ fun VerticalReorderList() {
         .detectReorderAfterLongPress(state)
     ) {
         items(data.value, { it }) { item ->
-            ReorderableItem(state, key = item) { isDragging ->
+            ReorderableItem(state, key = item, defaultDraggingModifier = Modifier) { isDragging ->
                 val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
                 Column(
                     modifier = Modifier

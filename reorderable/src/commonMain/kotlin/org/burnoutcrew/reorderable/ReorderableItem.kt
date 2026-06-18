@@ -40,8 +40,9 @@ fun LazyGridItemScope.ReorderableItem(
     key: Any?,
     modifier: Modifier = Modifier,
     index: Int? = null,
+    defaultDraggingModifier: Modifier = Modifier.animateItem(),
     content: @Composable BoxScope.(isDragging: Boolean) -> Unit
-) = ReorderableItem(reorderableState, key, modifier, Modifier.animateItem(), false, index, content)
+) = ReorderableItem(reorderableState, key, modifier, defaultDraggingModifier, false, index, content)
 
 @Composable
 fun ReorderableItem(
