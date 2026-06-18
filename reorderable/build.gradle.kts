@@ -52,7 +52,7 @@ publishing {
             artifact(javadocJar)
             pom {
                 name.set("ComposeReorderable")
-                description.set("Reorderable Compose LazyList")
+                description.set("Reorderable Compose LazyList and LazyGrid")
                 licenses {
                     license {
                         name.set("Apache-2.0")

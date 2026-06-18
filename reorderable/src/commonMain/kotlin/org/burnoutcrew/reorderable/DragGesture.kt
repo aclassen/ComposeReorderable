@@ -34,7 +34,7 @@ import androidx.compose.ui.util.fastFirstOrNull
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 
-// Copied from DragGestureDetector , as long the pointer api isn`t ready.
+// Copied from DragGestureDetector, as long as the pointer api isn't ready.
 
 internal suspend fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
     pointerId: PointerId,
