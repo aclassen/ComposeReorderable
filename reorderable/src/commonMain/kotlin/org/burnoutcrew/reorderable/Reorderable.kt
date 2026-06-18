@@ -16,7 +16,6 @@
 package org.burnoutcrew.reorderable
 
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerId
@@ -31,7 +30,7 @@ fun Modifier.reorderable(
     state: ReorderableState<*>
 ) = then(
     Modifier.pointerInput(Unit) {
-        forEachGesture {
+        eachGestureWhileActive {
             val dragStart = state.interactions.receive()
             val down = awaitPointerEventScope {
                 currentEvent.changes.fastFirstOrNull { it.id == dragStart.id }

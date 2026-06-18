@@ -88,50 +88,42 @@ internal suspend fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
     }
 }
 
-internal suspend fun PointerInputScope.awaitLongPressOrCancellation(
+internal suspend fun AwaitPointerEventScope.awaitLongPressOrCancellation(
     initialDown: PointerInputChange
 ): PointerInputChange? {
     var longPress: PointerInputChange? = null
     var currentDown = initialDown
     val longPressTimeout = viewConfiguration.longPressTimeoutMillis
     return try {
-        // wait for first tap up or long press
         withTimeout(longPressTimeout) {
-            awaitPointerEventScope {
-                var finished = false
-                while (!finished) {
-                    val event = awaitPointerEvent(PointerEventPass.Main)
-                    if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
-                        // All pointers are up
-                        finished = true
-                    }
+            var finished = false
+            while (!finished) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                if (event.changes.fastAll { it.changedToUpIgnoreConsumed() }) {
+                    finished = true
+                }
 
-                    if (
-                        event.changes.fastAny {
-                            it.isConsumed || it.isOutOfBounds(size, extendedTouchPadding)
-                        }
-                    ) {
-                        finished = true // Canceled
+                if (
+                    event.changes.fastAny {
+                        it.isConsumed || it.isOutOfBounds(size, extendedTouchPadding)
                     }
+                ) {
+                    finished = true
+                }
 
-                    // Check for cancel by position consumption. We can look on the Final pass of
-                    // the existing pointer event because it comes after the Main pass we checked
-                    // above.
-                    val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
-                    if (consumeCheck.changes.fastAny { it.isConsumed }) {
-                        finished = true
-                    }
-                    if (!event.isPointerUp(currentDown.id)) {
-                        longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
+                val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
+                if (consumeCheck.changes.fastAny { it.isConsumed }) {
+                    finished = true
+                }
+                if (!event.isPointerUp(currentDown.id)) {
+                    longPress = event.changes.fastFirstOrNull { it.id == currentDown.id }
+                } else {
+                    val newPressed = event.changes.fastFirstOrNull { it.pressed }
+                    if (newPressed != null) {
+                        currentDown = newPressed
+                        longPress = currentDown
                     } else {
-                        val newPressed = event.changes.fastFirstOrNull { it.pressed }
-                        if (newPressed != null) {
-                            currentDown = newPressed
-                            longPress = currentDown
-                        } else {
-                            // should technically never happen as we checked it above
-                            finished = true
-                        }
+                        finished = true
                     }
                 }
             }
@@ -140,6 +132,12 @@ internal suspend fun PointerInputScope.awaitLongPressOrCancellation(
     } catch (_: TimeoutCancellationException) {
         longPress ?: initialDown
     }
+}
+
+internal suspend fun PointerInputScope.awaitLongPressOrCancellation(
+    initialDown: PointerInputChange
+): PointerInputChange? = awaitPointerEventScope {
+    awaitLongPressOrCancellation(initialDown)
 }
 
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
